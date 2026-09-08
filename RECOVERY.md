@@ -1,5 +1,9 @@
 # Что делать, если что-то случилось
 
+Приложение: https://gorbatovroman86-coder.github.io/pulse-planner/
+Копии данных: https://github.com/gorbatovroman86-coder/pulse-planner-data (приватный)
+Облако: проект **pulse-planner** в https://supabase.com/dashboard
+
 Инструкция для человека, а не для инженера. Команды можно копировать целиком.
 
 Все команды выполняются в папке проекта. Открыть её в терминале:
@@ -12,7 +16,7 @@ cd ~/путь/к/puls
 Забрать их на компьютер:
 
 ```bash
-git clone git@github.com:ВЛАДЕЛЕЦ/pulse-planner-data.git ../pulse-planner-data
+git clone git@github.com:gorbatovroman86-coder/pulse-planner-data.git ../pulse-planner-data
 ```
 
 > Копия снимается каждую ночь в 03:00 по Новосибирску и коммитится персональным токеном
@@ -59,10 +63,10 @@ git clone git@github.com:ВЛАДЕЛЕЦ/pulse-planner-data.git ../pulse-planne
 5. Прописать новые адрес и анонимный ключ там, где живёт сайт:
 
    ```bash
-   gh secret set SUPABASE_URL      --repo ВЛАДЕЛЕЦ/pulse-planner
-   gh secret set SUPABASE_ANON_KEY --repo ВЛАДЕЛЕЦ/pulse-planner
-   gh secret set SUPABASE_SERVICE_ROLE_KEY --repo ВЛАДЕЛЕЦ/pulse-planner
-   gh workflow run "Публикация на GitHub Pages" --repo ВЛАДЕЛЕЦ/pulse-planner
+   gh secret set SUPABASE_URL      --repo gorbatovroman86-coder/pulse-planner
+   gh secret set SUPABASE_ANON_KEY --repo gorbatovroman86-coder/pulse-planner
+   gh secret set SUPABASE_SERVICE_ROLE_KEY --repo gorbatovroman86-coder/pulse-planner
+   gh workflow run "Публикация на GitHub Pages" --repo gorbatovroman86-coder/pulse-planner
    ```
 
 ---
@@ -90,13 +94,13 @@ git clone git@github.com:ВЛАДЕЛЕЦ/pulse-planner-data.git ../pulse-planne
 ## Проверить, что копии снимаются
 
 ```bash
-gh run list --workflow "Ночная копия данных" --repo ВЛАДЕЛЕЦ/pulse-planner --limit 5
+gh run list --workflow "Ночная копия данных" --repo gorbatovroman86-coder/pulse-planner --limit 5
 ```
 
 Запустить копию прямо сейчас:
 
 ```bash
-gh workflow run "Ночная копия данных" --repo ВЛАДЕЛЕЦ/pulse-planner
+gh workflow run "Ночная копия данных" --repo gorbatovroman86-coder/pulse-planner
 ```
 
 ---
