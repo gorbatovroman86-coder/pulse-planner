@@ -26,3 +26,6 @@ dist-ssr
 # секреты
 .env
 .env.local
+
+# служебное состояние supabase cli
+supabase/.temp/
