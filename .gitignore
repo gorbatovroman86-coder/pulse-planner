@@ -29,3 +29,12 @@ dist-ssr
 
 # служебное состояние supabase cli
 supabase/.temp/
+
+# секреты и ключи
+access.md
+*.key
+*.pem
+*secret*
+*token*
+credentials*
+!.env.example
