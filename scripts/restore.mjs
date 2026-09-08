@@ -55,6 +55,12 @@ if (snap.settings) {
   if (!res.ok) console.error('настройки не восстановлены:', res.status, await res.text())
 }
 
+// Идеи появились в третьей версии формата: снимки версии 2 их просто не содержат.
+let ideas = 0
+if (Array.isArray(snap.ideas) && snap.ideas.length) {
+  ideas = await upsertAll(url, key, 'ideas', snap.ideas)
+}
+
 const at = snap.exported_at ? new Date(snap.exported_at) : null
 const when = at
   ? `${String(at.getDate()).padStart(2, '0')}.${String(at.getMonth() + 1).padStart(2, '0')}.${at.getFullYear()}`
@@ -62,6 +68,7 @@ const when = at
 
 console.log(
   `Восстановлено: ${projects} ${plural(projects, 'проект', 'проекта', 'проектов')}, ` +
-    `${tasks} ${plural(tasks, 'задача', 'задачи', 'задач')}.\n` +
+    `${tasks} ${plural(tasks, 'задача', 'задачи', 'задач')}, ` +
+    `${ideas} ${plural(ideas, 'идея', 'идеи', 'идей')}.\n` +
     `Срез снят: ${when}.`,
 )

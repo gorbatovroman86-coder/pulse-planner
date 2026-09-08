@@ -13,6 +13,9 @@ const dir = process.argv[2] ?? 'backups'
 const projects = await readAll(url, key, 'projects')
 const tasks = await readAll(url, key, 'tasks')
 const settings = await readAll(url, key, 'settings', 'user_id')
+// Таблица идей появилась в третьей версии формата: пока миграция не накатана,
+// снимок обязан сниматься дальше, а не падать.
+const ideas = await readAll(url, key, 'ideas').catch(() => [])
 
 const snapshot = {
   exported_at: new Date().toISOString(),
@@ -20,6 +23,7 @@ const snapshot = {
   projects,
   tasks,
   settings: settings[0] ?? null,
+  ideas,
 }
 
 fs.mkdirSync(dir, { recursive: true })
@@ -43,7 +47,8 @@ for (const f of fs.readdirSync(dir)) {
 
 console.log(
   `Снимок ${day}: ${projects.length} ${plural(projects.length, 'проект', 'проекта', 'проектов')}, ` +
-    `${tasks.length} ${plural(tasks.length, 'задача', 'задачи', 'задач')}. ` +
+    `${tasks.length} ${plural(tasks.length, 'задача', 'задачи', 'задач')}, ` +
+    `${ideas.length} ${plural(ideas.length, 'идея', 'идеи', 'идей')}. ` +
     `Удалено старых снимков: ${removed}.`,
 )
 

@@ -41,6 +41,26 @@ export interface Task {
   deleted_at: string | null
 }
 
+export type IdeaStatus = 'proposed' | 'queued' | 'done' | 'dismissed'
+
+/** Предложение по доработке самого «Пульса». Живёт от «предложено» до «сделано». */
+export interface Idea {
+  id: string
+  title: string
+  /** Из какого наблюдения следует — то, что делает идею проверяемой. */
+  rationale: string
+  status: IdeaStatus
+  /** Кто предложил: я или владелец. */
+  source: 'claude' | 'owner'
+  /** Короткий хеш коммита, которым идея закрыта. */
+  done_ref: string
+  created_at: string
+  queued_at: string | null
+  done_at: string | null
+  updated_at: string
+  deleted_at: string | null
+}
+
 export interface Settings {
   /** Сколько часов помещается в рабочий день. */
   day_hours: number
@@ -55,6 +75,8 @@ export interface Snapshot {
   projects: Project[]
   tasks: Task[]
   settings?: Settings
+  /** Появились в версии 3; в старых снимках их нет. */
+  ideas?: Idea[]
 }
 
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3

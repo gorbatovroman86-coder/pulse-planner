@@ -1,5 +1,5 @@
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js'
-import type { Project, Settings, Task } from '../types'
+import type { Idea, Project, Settings, Task } from '../types'
 
 const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -18,7 +18,10 @@ export const supabase: SupabaseClient | null = cloudEnabled
     })
   : null
 
-export type Row = { table: 'projects' | 'tasks' | 'settings'; row: Record<string, unknown> }
+export type Row = {
+  table: 'projects' | 'tasks' | 'settings' | 'ideas'
+  row: Record<string, unknown>
+}
 
 /** Наружу уходят только колонки схемы: user_id ставит база из auth.uid(). */
 export function projectRow(p: Project): Record<string, unknown> {
@@ -56,6 +59,22 @@ export function taskRow(t: Task): Record<string, unknown> {
   }
 }
 
+export function ideaRow(i: Idea): Record<string, unknown> {
+  return {
+    id: i.id,
+    title: i.title,
+    rationale: i.rationale,
+    status: i.status,
+    source: i.source,
+    done_ref: i.done_ref,
+    created_at: i.created_at,
+    queued_at: i.queued_at,
+    done_at: i.done_at,
+    updated_at: i.updated_at,
+    deleted_at: i.deleted_at,
+  }
+}
+
 export async function getSession(): Promise<Session | null> {
   if (!supabase) return null
   const { data } = await supabase.auth.getSession()
@@ -71,6 +90,7 @@ export async function pushRows(rows: Row[]): Promise<void> {
   const projects = rows.filter((r) => r.table === 'projects').map((r) => r.row)
   const tasks = rows.filter((r) => r.table === 'tasks').map((r) => r.row)
   const settings = rows.filter((r) => r.table === 'settings').map((r) => r.row)
+  const ideas = rows.filter((r) => r.table === 'ideas').map((r) => r.row)
   if (settings.length) {
     const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'user_id' })
     if (error) throw new Error(error.message)
@@ -83,22 +103,32 @@ export async function pushRows(rows: Row[]): Promise<void> {
     const { error } = await supabase.from('tasks').upsert(tasks, { onConflict: 'id' })
     if (error) throw new Error(error.message)
   }
+  if (ideas.length) {
+    const { error } = await supabase.from('ideas').upsert(ideas, { onConflict: 'id' })
+    if (error) throw new Error(error.message)
+  }
 }
 
 export async function pullAll(): Promise<{
   projects: Project[]
   tasks: Task[]
   settings: Settings | null
+  ideas: Idea[]
 }> {
-  if (!supabase) return { projects: [], tasks: [], settings: null }
-  const [p, t, s] = await Promise.all([
+  if (!supabase) return { projects: [], tasks: [], settings: null, ideas: [] }
+  const [p, t, s, i] = await Promise.all([
     supabase.from('projects').select('*'),
     supabase.from('tasks').select('*'),
     supabase.from('settings').select('*').maybeSingle(),
+    supabase.from('ideas').select('*'),
   ])
   if (p.error) throw new Error(p.error.message)
   if (t.error) throw new Error(t.error.message)
+  // Таблица идей появилась позже: пока миграция не накатана, это не повод
+  // ронять всю синхронизацию.
+  const ideas = i.error ? [] : ((i.data ?? []) as unknown as Idea[])
   return {
+    ideas,
     projects: ((p.data ?? []) as unknown as Project[]).map((x) => ({ ...x, emoji: x.emoji ?? '' })),
     tasks: ((t.data ?? []) as unknown as Task[]).map((x) => ({
       ...x,

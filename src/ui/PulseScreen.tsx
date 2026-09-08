@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
-import type { Project, Task } from '../types'
+import type { Idea, Project, Task } from '../types'
 import { computePulse, inboxList, sortPulses, todayList, type Pulse } from '../lib/derive'
 import { fmtDuration, plural } from '../lib/dates'
 import { Ledger } from './Ledger'
 import { Today } from './Today'
 import { Inbox } from './Inbox'
+import { Proposals } from './Roadmap'
 
 export function PulseScreen({
   projects,
   tasks,
+  ideas,
   dayHours,
   warmedId,
   landedId,
@@ -17,6 +19,7 @@ export function PulseScreen({
 }: {
   projects: Project[]
   tasks: Task[]
+  ideas: Idea[]
   dayHours: number
   warmedId: string | null
   landedId: string | null
@@ -68,6 +71,7 @@ export function PulseScreen({
             selectedId={selectedId}
             dayHours={dayHours}
           />
+          <Proposals ideas={ideas} />
         </div>
       </div>
     </div>

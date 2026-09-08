@@ -10,13 +10,15 @@ import { SyncLine } from './ui/SyncLine'
 import { DataMenu } from './ui/DataMenu'
 import { Help, Search } from './ui/Overlays'
 import { Auth } from './ui/Auth'
+import { RoadmapScreen } from './ui/Roadmap'
 
-type Screen = 'pulse' | 'project' | 'week'
+type Screen = 'pulse' | 'project' | 'week' | 'roadmap'
 
 const TABS: [Screen, string, string][] = [
   ['pulse', 'Пульс', '1'],
   ['project', 'Проект', '2'],
   ['week', 'Неделя', '3'],
+  ['roadmap', 'Роадмэп', '4'],
 ]
 
 export default function App() {
@@ -194,6 +196,7 @@ export default function App() {
           <PulseScreen
             projects={state.projects}
             tasks={state.tasks}
+            ideas={state.ideas}
             dayHours={state.settings.day_hours}
             warmedId={warmedProject?.id ?? null}
             landedId={landedId}
@@ -210,6 +213,7 @@ export default function App() {
             onSelect={setProjectId}
           />
         )}
+        {screen === 'roadmap' && <RoadmapScreen ideas={state.ideas} />}
         {screen === 'week' && (
           <WeekScreen
             projects={state.projects}

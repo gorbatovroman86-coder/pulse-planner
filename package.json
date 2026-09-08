@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "restore": "node --env-file-if-exists=.env scripts/restore.mjs",
-    "backup": "node --env-file-if-exists=.env scripts/backup.mjs"
+    "backup": "node --env-file-if-exists=.env scripts/backup.mjs",
+    "ideas": "node --env-file-if-exists=.env scripts/ideas.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geologica": "^5.3.0",

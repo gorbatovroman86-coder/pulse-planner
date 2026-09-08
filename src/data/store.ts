@@ -1,11 +1,22 @@
 import { useSyncExternalStore } from 'react'
-import type { Priority, Project, Settings, Snapshot, Subtask, Task, TaskStatus } from '../types'
+import type {
+  Idea,
+  IdeaStatus,
+  Priority,
+  Project,
+  Settings,
+  Snapshot,
+  Subtask,
+  Task,
+  TaskStatus,
+} from '../types'
 import { DEFAULT_SETTINGS, SCHEMA_VERSION } from '../types'
 import { uid } from '../lib/id'
 import { buildSeed, PIGMENTS } from './seed'
 import {
   cloudEnabled,
   currentUserId,
+  ideaRow,
   projectRow,
   pullAll,
   pushRows,
@@ -22,6 +33,7 @@ export interface State {
   projects: Project[]
   tasks: Task[]
   settings: Settings
+  ideas: Idea[]
 }
 
 /** Что видит владелец в индикаторе. */
@@ -33,7 +45,7 @@ export type SyncState =
   | 'offline'
   | 'error'
 
-let state: State = { projects: [], tasks: [], settings: { ...DEFAULT_SETTINGS } }
+let state: State = { projects: [], tasks: [], settings: { ...DEFAULT_SETTINGS }, ideas: [] }
 let queue = new Set<string>()
 let sync: SyncState = cloudEnabled ? 'signedout' : 'local'
 let syncError = ''
@@ -97,6 +109,7 @@ function loadLocal(): boolean {
       projects: parsed.projects,
       tasks: parsed.tasks,
       settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
+      ideas: Array.isArray(parsed.ideas) ? parsed.ideas : [],
     }
     const q = localStorage.getItem(KEY_QUEUE)
     queue = new Set(q ? (JSON.parse(q) as string[]) : [])
@@ -110,7 +123,7 @@ export function initStore() {
   const had = loadLocal()
   if (!had && !cloudEnabled) {
     const seed = buildSeed()
-    state = { ...seed, settings: { ...DEFAULT_SETTINGS } }
+    state = { ...seed, settings: { ...DEFAULT_SETTINGS }, ideas: [] }
     markAll()
     persist()
   }
@@ -149,7 +162,7 @@ function setSync(s: SyncState, err = '') {
 
 // ── Очередь изменений ─────────────────────────────────────────────────────
 
-function mark(table: 'projects' | 'tasks' | 'settings', id: string) {
+function mark(table: 'projects' | 'tasks' | 'settings' | 'ideas', id: string) {
   queue.add(`${table}:${id}`)
 }
 
@@ -157,6 +170,7 @@ function markAll() {
   state.projects.forEach((p) => mark("projects", p.id))
   mark("settings", "me")
   state.tasks.forEach((t) => mark('tasks', t.id))
+  state.ideas.forEach((i) => mark('ideas', i.id))
 }
 
 let flushTimer: ReturnType<typeof setTimeout> | null = null
@@ -188,6 +202,9 @@ export async function flush(): Promise<void> {
       if (p) rows.push({ table: 'projects', row: projectRow(p) })
     } else if (table === 'settings') {
       if (uid) rows.push({ table: 'settings', row: settingsRow(state.settings, uid) })
+    } else if (table === 'ideas') {
+      const i = state.ideas.find((x) => x.id === id)
+      if (i) rows.push({ table: 'ideas', row: ideaRow(i) })
     } else {
       const t = state.tasks.find((x) => x.id === id)
       if (t) rows.push({ table: 'tasks', row: taskRow(t) })
@@ -228,6 +245,7 @@ export async function refresh(first = false): Promise<void> {
     state = {
       projects: mergeById(state.projects, remote.projects),
       tasks: mergeById(state.tasks, remote.tasks),
+      ideas: mergeById(state.ideas, remote.ideas),
       settings:
         remoteSettings &&
         new Date(remoteSettings.updated_at).getTime() >
@@ -428,6 +446,51 @@ export function clearWarm() {
   emit()
 }
 
+// ── Идеи по доработке продукта ────────────────────────────────────────────
+
+export function addIdea(title: string, rationale = '', source: Idea['source'] = 'owner') {
+  const ts = now()
+  const idea: Idea = {
+    id: uid(),
+    title: title.trim(),
+    rationale: rationale.trim(),
+    status: 'proposed',
+    source,
+    done_ref: '',
+    created_at: ts,
+    queued_at: null,
+    done_at: null,
+    updated_at: ts,
+    deleted_at: null,
+  }
+  state = { ...state, ideas: [...state.ideas, idea] }
+  mark('ideas', idea.id)
+  commit()
+  return idea.id
+}
+
+/** Перевод по жизненному циклу. Отметки времени ставятся по факту перехода. */
+export function setIdeaStatus(id: string, status: IdeaStatus, doneRef = '') {
+  const ts = now()
+  state = {
+    ...state,
+    ideas: state.ideas.map((i) =>
+      i.id === id
+        ? {
+            ...i,
+            status,
+            queued_at: status === 'queued' ? ts : i.queued_at,
+            done_at: status === 'done' ? ts : i.done_at,
+            done_ref: status === 'done' ? doneRef : i.done_ref,
+            updated_at: ts,
+          }
+        : i,
+    ),
+  }
+  mark('ideas', id)
+  commit()
+}
+
 // ── Экспорт и импорт ──────────────────────────────────────────────────────
 
 export function exportSnapshot(): Snapshot {
@@ -437,6 +500,7 @@ export function exportSnapshot(): Snapshot {
     projects: state.projects,
     tasks: state.tasks,
     settings: state.settings,
+    ideas: state.ideas,
   }
 }
 
@@ -449,13 +513,16 @@ export function importSnapshot(snap: Snapshot, mode: 'merge' | 'replace' = 'repl
   const settings = snap.settings
     ? { day_hours: Number(snap.settings.day_hours) || 8, updated_at: snap.settings.updated_at }
     : state.settings
+  // Снимки версии 2 идей не содержат — при замене это не повод их стирать.
+  const ideas = snap.ideas ?? state.ideas
   state =
     mode === 'replace'
-      ? { projects, tasks, settings }
+      ? { projects, tasks, settings, ideas }
       : {
           projects: mergeById(state.projects, projects),
           tasks: mergeById(state.tasks, tasks),
           settings,
+          ideas: mergeById(state.ideas, ideas),
         }
   markAll()
   commit()
