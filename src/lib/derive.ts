@@ -18,6 +18,12 @@ export interface Pulse {
   noTasks: boolean
   /** Лента: минуты, закрытые в каждый из последних STRIP_DAYS дней. */
   strip: number[]
+  /** Для каждого дня ленты: был ли проект в этот день мёртв. */
+  deadDays: boolean[]
+  /** Сколько раз проект умирал за окно ленты. */
+  deaths: number
+  /** Сколько дней осталось до смерти; null — уже мёртв или ещё не начат. */
+  daysToDeath: number | null
 }
 
 export const STRIP_DAYS = 21
@@ -72,10 +78,32 @@ export function computePulse(project: Project, tasks: Task[], now = new Date()):
   const lastTouch = touchMs ? new Date(touchMs).toISOString() : null
   const daysSinceTouch = touchMs === null ? null : daysBetween(new Date(touchMs), now)
 
+  // Смерть по правилу владельца: подряд cooldown дней без единой закрытой задачи.
+  const cd = Math.max(1, project.cooldown_days)
+  const deadDays = strip.map((_, i) => {
+    for (let k = 0; k < cd; k++) {
+      const idx = i - k
+      if (idx < 0) return false
+      if (strip[idx] > 0) return false
+    }
+    return true
+  })
+  // Смертью считается только обрыв работы: проект, который в окне
+  // ни разу не работал, не «умер один раз», а просто не начинался.
+  const firstWorkDay = strip.findIndex((m) => m > 0)
+  let deaths = 0
+  if (firstWorkDay >= 0) {
+    for (let i = firstWorkDay + 1; i < deadDays.length; i++) {
+      if (deadDays[i] && !deadDays[i - 1]) deaths += 1
+    }
+  }
+
   return {
     project,
     investedMinutes,
     budgetMinutes: Math.round(project.weekly_budget_hours * 60),
+    deadDays,
+    deaths,
     openTasks,
     todayTasks,
     nextDue,
@@ -85,6 +113,8 @@ export function computePulse(project: Project, tasks: Task[], now = new Date()):
     cold: daysSinceTouch === null || daysSinceTouch >= project.cooldown_days,
     noTasks: openTasks.length === 0,
     strip,
+    daysToDeath:
+      daysSinceTouch === null || daysSinceTouch >= cd ? null : cd - daysSinceTouch,
   }
 }
 

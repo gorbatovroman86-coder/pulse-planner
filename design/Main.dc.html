@@ -14,14 +14,13 @@
     .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
     .card { background: #FFFFFF; border: 1px solid #E2E7EB; border-radius: 12px; box-shadow: 0 1px 2px rgba(17,24,32,.04), 0 10px 28px -16px rgba(17,24,32,.16); }
     .count { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; font-weight: 500; color: #8A95A1; background: #F6F8F9; border-radius: 999px; padding: 1px 7px; }
-    .sticker { width: 224px; border: 1px solid #E2E7EB; border-radius: 12px; background: #fff; overflow: hidden; box-shadow: 0 1px 2px rgba(17,24,32,.04), 0 10px 28px -16px rgba(17,24,32,.16); }
-    .band { border-radius: 12px; padding: 12px; }
+    .row { display: flex; align-items: center; gap: 12px; height: 54px; padding: 0 20px; border-top: 1px solid #EDF0F3; }
+    .zone { display: flex; align-items: center; gap: 8px; padding: 16px 20px 8px; }
   </style>
 </helmet>
 
-<div style="width: 1440px; height: 980px; background: #EEF1F3; color: #111820; font-family: 'Geologica', ui-sans-serif, sans-serif; font-size: 14.5px; display: flex; flex-direction: column;">
+<div style="width: 1440px; height: 940px; background: #EEF1F3; color: #111820; font-family: 'Geologica', ui-sans-serif, sans-serif; font-size: 14.5px; display: flex; flex-direction: column;">
 
-  <!-- Шапка -->
   <div style="position: relative; display: flex; align-items: center; gap: 20px; padding: 10px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E7EB;">
     <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em;">Пульс</span>
     <div style="display: flex; gap: 2px; padding: 3px; background: #F6F8F9; border-radius: 10px;">
@@ -56,67 +55,42 @@
 
     <div style="display: grid; grid-template-columns: minmax(0, 1fr) 364px; gap: 20px; align-items: start;">
 
-      <!-- Доска -->
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <sc-for list="{{bands}}" as="b" hint-placeholder-count="3">
-          <div class="band" style="background: {{b.soft}};">
-            <div style="display: flex; align-items: center; gap: 8px; padding: 0 4px 10px;">
-              <span style="font-size: 16px; line-height: 1;">{{b.emoji}}</span>
-              <span style="font-size: 13.5px; font-weight: 500; color: {{b.ink}};">{{b.title}}</span>
-              <span class="count">{{b.count}}</span>
-              <span style="font-size: 12.5px; color: #AEB8C2;">{{b.hint}}</span>
+      <div class="card" style="overflow: hidden;">
+        <sc-for list="{{zones}}" as="z" hint-placeholder-count="3">
+          <div>
+            <div class="zone" style="background: {{z.bg}};">
+              <span style="font-size: 14px; line-height: 1;">{{z.emoji}}</span>
+              <span style="font-size: 13px; font-weight: 500; color: {{z.ink}};">{{z.title}}</span>
+              <span class="count">{{z.count}}</span>
+              <span style="font-size: 12.5px; color: #AEB8C2;">{{z.hint}}</span>
             </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-              <sc-for list="{{b.items}}" as="p" hint-placeholder-count="3">
-                <div class="sticker" style="{{p.tilt}}">
-                  <div style="height: 5px; background: {{p.color}};"></div>
-                  <div style="padding: 12px; {{p.fade}}">
-                    <div style="display: flex; align-items: flex-start; gap: 8px;">
-                      <span style="font-size: 20px; line-height: 1;">{{p.emoji}}</span>
-                      <span style="flex-grow: 1; font-size: 14px; font-weight: 500; line-height: 1.25;">{{p.name}}</span>
-                    </div>
-                    <div style="padding-top: 6px; font-size: 12.5px; color: #8A95A1;">
-                      {{p.tasks}} <span style="color: #AEB8C2;">·</span> <span class="num" style="color: {{p.daysInk}};">{{p.days}}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px; padding-top: 14px;">
-                      <span style="position: relative; display: block; width: 116px; height: 6px; border-radius: 999px; background: #EDF0F3; overflow: hidden;">
-                        <span style="position: absolute; top: 0; bottom: 0; left: 0; width: {{p.fill}}; border-radius: 999px; background: {{p.color}};"></span>
-                      </span>
-                      <span class="num" style="font-size: 11.5px; color: #AEB8C2;">{{p.budget}}</span>
-                    </div>
-                  </div>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-        </sc-for>
+            <sc-for list="{{z.items}}" as="p" hint-placeholder-count="2">
+              <div class="row" style="background: {{z.rowBg}};">
+                <span style="font-size: 16px; line-height: 1; {{p.fade}}">{{p.emoji}}</span>
+                <span style="flex-grow: 1; min-width: 0; font-size: 15px; font-weight: 500; color: {{p.nameInk}};">{{p.name}}</span>
 
-        <!-- Разворот проекта с подсказчиком -->
-        <div class="card" style="overflow: hidden;">
-          <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #EDF0F3; box-shadow: inset 3px 0 0 #2E7D5B;">
-            <span style="font-size: 17px; line-height: 1;">⚖️</span>
-            <span style="flex-grow: 1; font-size: 15px; font-weight: 500;">БДР (мотивация)</span>
-            <span style="font-size: 12.5px; color: #8A95A1;">три недели</span>
-            <span style="display: flex; align-items: flex-end; gap: 2px; height: 20px;">
-              <sc-for list="{{strip}}" as="s" hint-placeholder-count="21">
-                <span style="width: 4px; height: {{s.h}}; border-radius: 999px; background: {{s.c}};"></span>
-              </sc-for>
-            </span>
-          </div>
-          <div style="padding: 12px 16px 4px; display: flex; flex-direction: column; gap: 6px;">
-            <sc-for list="{{advice}}" as="a" hint-placeholder-count="2">
-              <div style="display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #F6F8F9;">
-                <span style="font-size: 15px; line-height: 1;">{{a.emoji}}</span>
-                <span style="flex-grow: 1; font-size: 13px; line-height: 1.5; color: #57626E;">{{a.text}}</span>
-                <span style="padding: 4px 10px; border: 1px solid #E2E7EB; border-radius: 7px; background: #fff; font-size: 12.5px; font-weight: 500; color: #57626E; white-space: nowrap;">Добавить</span>
+                <!-- Инфографика смертей -->
+                <span style="display: flex; flex-direction: column;">
+                  <span style="display: flex; align-items: flex-end; gap: 2px; height: 26px;">
+                    <sc-for list="{{p.bars}}" as="b" hint-placeholder-count="21">
+                      <span style="width: 5px; height: {{b.h}}; border-radius: 999px; background: {{b.c}};"></span>
+                    </sc-for>
+                  </span>
+                  <span style="display: flex; margin-top: 4px; height: 4px; border-radius: 999px; overflow: hidden;">
+                    <sc-for list="{{p.life}}" as="l" hint-placeholder-count="21">
+                      <span style="width: 7px; height: 100%; background: {{l.c}};"></span>
+                    </sc-for>
+                  </span>
+                </span>
+
+                <span style="width: 58px; text-align: right; font-size: 12.5px; color: {{p.deathInk}};">{{p.deaths}}</span>
+                <span class="num" style="width: 74px; text-align: right; font-size: 13px;"><span style="font-weight: 500; color: {{p.invInk}};">{{p.inv}}</span><span style="color: #AEB8C2;"> / {{p.bud}} ч</span></span>
+                <span style="width: 112px; text-align: right; font-size: 13px; color: {{p.stInk}};">{{p.status}}</span>
+                <span style="color: #AEB8C2;">›</span>
               </div>
             </sc-for>
           </div>
-          <div style="display: flex; gap: 8px; padding: 12px 16px 16px;">
-            <span style="flex-grow: 1; height: 34px; padding: 0 12px; display: flex; align-items: center; background: #fff; border: 1px solid #E2E7EB; border-radius: 9px; font-size: 14px; color: #AEB8C2;">Новая задача — БДР (мотивация)</span>
-            <span style="padding: 8px 12px; border: 1px solid #E2E7EB; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #57626E;">Отметить касание</span>
-          </div>
-        </div>
+        </sc-for>
       </div>
 
       <!-- Сегодня -->
@@ -157,50 +131,74 @@
 
 <script data-dc-script>
 class Component extends DCLogic {
-  renderVals() {
-    const P = (emoji, name, color, tasks, days, daysInk, inv, bud, extra = {}) => ({
-      emoji, name, color, tasks, days, daysInk,
-      budget: `${inv}/${bud} ч`,
-      fill: Math.round(Math.min(1, inv / bud) * 100) + '%',
-      tilt: extra.tilt || '',
-      fade: extra.fade || '',
-    })
-    const vals = [0,0,0,90,0,0,120,0,0,0,60,0,0,150,0,0,90,0,0,120,180]
+  mix(hex, k) {
+    const n = parseInt(hex.slice(1), 16)
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
+    const m = (c) => Math.round(c * k + 255 * (1 - k))
+    return `rgb(${m(r)}, ${m(g)}, ${m(b)})`
+  }
+  build(emoji, name, color, vals, inv, bud, status, stInk, opts = {}) {
     const max = Math.max(60, ...vals)
+    const cd = 2
+    const dead = vals.map((_, i) => {
+      for (let k = 0; k < cd; k++) {
+        const idx = i - k
+        if (idx < 0) return false
+        if (vals[idx] > 0) return false
+      }
+      return true
+    })
+    const first = vals.findIndex((v) => v > 0)
+    const worked = first >= 0
+    let deaths = 0
+    if (worked) for (let i = first + 1; i < dead.length; i++) if (dead[i] && !dead[i - 1]) deaths += 1
     return {
-      bands: [
-        {
-          emoji: '🔥', title: 'Горит', count: 2, hint: 'сегодня к ним прикасались',
-          soft: '#FEF3E2', ink: '#B45309',
-          items: [
-            P('🏭', 'МЭЗ Карасук/Бийск', '#A8452F', '3 задачи', 'сегодня', '#8A95A1', 6.5, 8),
-            P('🌽', 'Кукуруза', '#B57A1F', '2 задачи', 'сегодня', '#8A95A1', 1.5, 5),
-          ],
-        },
-        {
-          emoji: '🌡️', title: 'Стынет', count: 2, hint: 'день без закрытых задач — ещё можно спасти',
-          soft: '#EAF2EF', ink: '#0F5F4F',
-          items: [
-            P('🗺️', 'Агроаналитика Китай — РФ', '#2A6E86', '4 задачи', '1 день', '#8A95A1', 2, 6),
-            P('🫒', 'Пульт «Ядро + Масло»', '#6E7C22', '1 задача', '1 день', '#8A95A1', 0.5, 6),
-          ],
-        },
-        {
-          emoji: '💀', title: 'Умер', count: 2, hint: 'порог пройден, работа встала',
-          soft: '#FBEDE6', ink: '#C2410C',
-          items: [
-            P('⚖️', 'БДР (мотивация)', '#2E7D5B', 'нет задач', '9 дней', '#C2410C', 0, 4, { tilt: 'transform: rotate(-0.7deg);', fade: 'filter: saturate(.45);' }),
-            P('📰', 'Мониторинг рынка', '#6B4E9B', '1 задача', '4 дня', '#C2410C', 0, 3, { tilt: 'transform: rotate(-0.7deg);', fade: 'filter: saturate(.45);' }),
-          ],
-        },
-      ],
-      strip: vals.map((v, i) => ({
-        h: (v > 0 ? Math.max(4, Math.round((v / max) * 20)) : 2) + 'px',
-        c: v > 0 ? (i === vals.length - 1 ? '#2E7D5B' : 'rgb(170,205,190)') : '#E2E7EB',
+      emoji, name, status,
+      inv: String(inv).replace('.', ','), bud: String(bud).replace('.', ','),
+      invInk: inv ? '#111820' : '#AEB8C2',
+      nameInk: opts.grave ? '#57626E' : '#111820',
+      fade: opts.grave ? 'filter: grayscale(.75) opacity(.8);' : '',
+      stInk,
+      deaths: worked ? (deaths ? '💀 ' + deaths : 'жив') : '—',
+      deathInk: worked ? (deaths ? '#C2410C' : '#0F5F4F') : '#AEB8C2',
+      bars: vals.map((v, i) => ({
+        h: (v > 0 ? Math.max(4, Math.round((v / max) * 26)) : 2) + 'px',
+        c: v > 0 ? (i === vals.length - 1 ? color : this.mix(color, 0.55)) : '#EDF0F3',
       })),
-      advice: [
-        { emoji: '🫀', text: '9 дней без закрытых задач. Возьми одну мелочь на 15 минут — она вернёт проект к жизни.' },
-        { emoji: '🧩', text: 'Проект провисает: нет ни одной открытой задачи. Самый дешёвый способ сдвинуть — назначить один маленький шаг на полчаса.' },
+      life: vals.map((_, i) => {
+        const d = worked && dead[i]
+        const died = d && !dead[i - 1] && i > 0
+        return { c: d ? (died ? '#C2410C' : 'rgb(243,205,190)') : worked ? this.mix(color, 0.72) : '#EDF0F3' }
+      }),
+    }
+  }
+  renderVals() {
+    const z = (n) => new Array(n).fill(0)
+    return {
+      zones: [
+        {
+          emoji: '🟢', title: 'В работе', count: 2, hint: 'сегодня закрывал задачи',
+          ink: '#0F5F4F', bg: 'transparent', rowBg: 'transparent',
+          items: [
+            this.build('🏭', 'МЭЗ Карасук/Бийск', '#A8452F', [0,90,0,120,0,60,0,0,150,90,0,0,120,0,0,180,60,0,90,120,240], 6.5, 8, 'сегодня', '#0F5F4F'),
+            this.build('🌽', 'Кукуруза', '#B57A1F', [0,45,0,0,90,0,0,0,60,0,0,0,0,120,0,0,45,0,90,0,60], 1.5, 5, 'сегодня', '#0F5F4F'),
+          ],
+        },
+        {
+          emoji: '⚠️', title: 'На грани', count: 1, hint: 'ещё день — и умрёт',
+          ink: '#B45309', bg: 'transparent', rowBg: 'transparent',
+          items: [
+            this.build('🗺️', 'Агроаналитика Китай — РФ', '#2A6E86', [90,60,0,0,0,0,120,45,0,0,0,0,0,150,60,0,0,0,0,90,0], 2, 6, 'умрёт завтра', '#B45309'),
+          ],
+        },
+        {
+          emoji: '💀', title: 'Кладбище', count: 2, hint: 'работа встала',
+          ink: '#C2410C', bg: '#F6F8F9', rowBg: '#F6F8F9',
+          items: [
+            this.build('⚖️', 'БДР (мотивация)', '#2E7D5B', [60,0,0,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], 0, 4, 'мёртв 9 дней', '#C2410C', { grave: true }),
+            this.build('📰', 'Мониторинг рынка', '#6B4E9B', z(21), 0, 3, 'мёртв 4 дня', '#C2410C', { grave: true }),
+          ],
+        },
       ],
       today: [
         { title: 'Свести капзатраты по двум площадкам', est: '2 ч', color: '#A8452F' },

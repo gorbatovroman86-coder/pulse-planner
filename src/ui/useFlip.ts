@@ -18,8 +18,12 @@ export function useFlip(keys: string[]) {
       if (Math.abs(delta) < 1) return
       el.style.transition = 'none'
       el.style.transform = `translateY(${delta}px)`
+      // Вниз проект проваливается тяжелее, чем всплывает наверх.
+      const sinking = delta < 0
       requestAnimationFrame(() => {
-        el.style.transition = 'transform 420ms cubic-bezier(0.22, 1, 0.36, 1)'
+        el.style.transition = sinking
+          ? 'transform 700ms cubic-bezier(0.55, 0.06, 0.68, 0.19)'
+          : 'transform 420ms cubic-bezier(0.22, 1, 0.36, 1)'
         el.style.transform = ''
       })
     })
