@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #14453C; } a:hover { color: #0C2C27; }
+    .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    .eyebrow { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8A938E; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; background: #E5E8E4; color: #161C1A; font-family: 'Geologica', ui-sans-serif, sans-serif; font-weight: 350; font-size: 14px; padding: 24px; box-sizing: border-box; display: flex; gap: 28px; align-items: flex-start;">
+
+  <!-- Список проектов -->
+  <div style="width: 236px; flex-shrink: 0;">
+    <div class="eyebrow" style="padding: 0 8px 6px;">все проекты</div>
+    <div style="height: 1px; background: #8A938E;"></div>
+    <sc-for list="{{list}}" as="p" hint-placeholder-count="7">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-bottom: 1px solid #DCE0DA; background: {{p.bg}};">
+        <span style="width: 3px; height: 13px; flex-shrink: 0; background: {{p.color}};"></span>
+        <span style="flex-grow: 1; font-size: 13px; font-weight: {{p.weight}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{p.name}}</span>
+      </div>
+    </sc-for>
+    <div class="eyebrow" style="margin-top: 12px; border: 1px solid #CCD2CC; padding: 7px 8px; text-align: center;">+ новый проект</div>
+  </div>
+
+  <!-- Карточка проекта -->
+  <div style="flex-grow: 1; max-width: 880px;">
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+      <span style="margin-top: 7px; width: 4px; height: 26px; flex-shrink: 0; background: #A8452F;"></span>
+      <div style="flex-grow: 1; min-width: 0;">
+        <div style="font-size: 24px; font-weight: 300;">МЭЗ Карасук/Бийск</div>
+        <div style="margin-top: 4px; font-size: 13px; color: #4E5A55;">Оценка площадок под маслоэкстракционный завод</div>
+      </div>
+      <span class="eyebrow" style="border: 1px solid #CCD2CC; padding: 6px 8px; white-space: nowrap;">отметить касание</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 20px; padding: 12px 0; border-top: 1px solid #CCD2CC; border-bottom: 1px solid #CCD2CC;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="eyebrow">вложено / бюджет, ч</span>
+        <span class="num" style="font-size: 12.5px;"><span style="font-weight: 500;">6,5</span><span style="color: #AEB6B1;">/8</span></span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="eyebrow">простой</span>
+        <span class="num" style="font-size: 15px;">0 дней</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="eyebrow">открытых задач</span>
+        <span class="num" style="font-size: 15px;">3</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="eyebrow">три недели</span>
+        <span style="display: flex; align-items: flex-end; gap: 2px; height: 22px;">
+          <sc-for list="{{strip}}" as="b" hint-placeholder-count="21">
+            <span style="width: 4px; height: {{b.h}}; background: {{b.c}};"></span>
+          </sc-for>
+        </span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 12px; padding-bottom: 12px; border-bottom: 1px solid #DCE0DA;">
+      <span style="display: flex; align-items: center; gap: 8px;"><span class="eyebrow">недельный бюджет, ч</span><span class="num" style="border: 1px solid #CCD2CC; padding: 3px 6px; font-size: 12.5px; width: 44px;">8</span></span>
+      <span style="display: flex; align-items: center; gap: 8px;"><span class="eyebrow">порог остывания, дней</span><span class="num" style="border: 1px solid #CCD2CC; padding: 3px 6px; font-size: 12.5px; width: 44px;">7</span></span>
+      <span style="display: flex; align-items: center; gap: 8px;"><span class="eyebrow">статус</span><span style="border: 1px solid #CCD2CC; padding: 3px 6px; font-size: 12.5px;">активный</span></span>
+      <span style="flex-grow: 1;"></span>
+      <span class="eyebrow">удалить проект</span>
+    </div>
+
+    <div style="margin-top: 24px; height: 32px; border: 1px solid #CCD2CC; background: #F2F4F1; display: flex; align-items: center; padding: 0 8px; font-size: 13px; color: #AEB6B1;">Новая задача в этом проекте</div>
+
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+      <div style="margin-top: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 6px;">
+          <span class="eyebrow">{{g.title}}</span>
+          <span class="num" style="font-size: 11px; color: #8A938E;">{{g.count}}</span>
+          <span style="flex-grow: 1; height: 1px; background: #CCD2CC;"></span>
+        </div>
+        <div style="height: 1px; background: {{g.rule}};"></div>
+        <sc-for list="{{g.tasks}}" as="t" hint-placeholder-count="2">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-bottom: 1px solid #DCE0DA;">
+            <span style="width: 15px; height: 15px; flex-shrink: 0; border: 1px solid {{t.boxInk}}; background: {{t.boxFill}};"></span>
+            <span style="display: flex; gap: 2px; flex-shrink: 0;"><span style="width: 2px; height: 9px; background: {{t.p1}};"></span><span style="width: 2px; height: 9px; background: {{t.p2}};"></span><span style="width: 2px; height: 9px; background: {{t.p3}};"></span></span>
+            <span style="flex-grow: 1; font-size: 13.5px; color: {{t.ink}}; text-decoration: {{t.line}};">{{t.title}}</span>
+            <span class="num" style="font-size: 11.5px; color: #8A938E;">{{t.due}}</span>
+            <span class="num" style="font-size: 11.5px; color: #4E5A55; width: 34px; text-align: right;">{{t.est}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+
+    <div style="margin-top: 32px;">
+      <div class="eyebrow" style="padding-bottom: 6px;">история по неделям</div>
+      <div style="height: 1px; background: #8A938E;"></div>
+      <div style="display: flex; align-items: flex-end; gap: 8px; padding-top: 12px;">
+        <sc-for list="{{history}}" as="h" hint-placeholder-count="8">
+          <div style="display: flex; flex-direction: column; align-items: center; width: 54px;">
+            <span class="num" style="padding-bottom: 4px; font-size: 11px; color: #8A938E;">{{h.count}}</span>
+            <div style="display: flex; width: 100%; height: 68px; align-items: flex-end; justify-content: center; border-bottom: 1px solid #AEB6B1;">
+              <div style="width: 22px; height: {{h.h}}; background: {{h.c}};"></div>
+            </div>
+            <span class="num" style="padding-top: 6px; font-size: 10.5px; color: #8A938E;">{{h.date}}</span>
+            <span class="num" style="font-size: 10.5px; color: #4E5A55;">{{h.hours}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const color = '#A8452F'
+    const vals = [90,0,120,0,60,0,0,150,90,0,0,120,0,0,180,60,0,90,120,0,240]
+    const max = Math.max(60, ...vals)
+    const task = (title, due, est, done, prio) => ({
+      title, due, est,
+      ink: done ? '#8A938E' : '#161C1A',
+      line: done ? 'line-through' : 'none',
+      boxInk: done ? '#14453C' : '#8A938E',
+      boxFill: done ? '#14453C' : 'transparent',
+      p1: prio >= 1 ? '#4E5A55' : '#CCD2CC',
+      p2: prio >= 2 ? '#4E5A55' : '#CCD2CC',
+      p3: prio >= 3 ? '#4E5A55' : '#CCD2CC',
+    })
+    const hist = [0, 120, 240, 0, 360, 180, 300, 390]
+    const hmax = Math.max(60, ...hist)
+    return {
+      strip: vals.map((v, i) => ({
+        h: (v > 0 ? Math.max(3, Math.round((v / max) * 22)) : 1) + 'px',
+        c: v > 0 ? (i === vals.length - 1 ? color : 'rgb(196,146,132)') : '#CCD2CC',
+      })),
+      list: [
+        { name: 'МЭЗ Карасук/Бийск', color: '#A8452F', bg: '#F2F4F1', weight: '500' },
+        { name: 'Агроаналитика Китай — РФ', color: '#2A6E86', bg: 'transparent', weight: '350' },
+        { name: 'Кукуруза', color: '#B57A1F', bg: 'transparent', weight: '350' },
+        { name: 'Пульт «Ядро + Масло»', color: '#6E7C22', bg: 'transparent', weight: '350' },
+        { name: 'Договоры НПК', color: '#3B5EA6', bg: 'transparent', weight: '350' },
+        { name: 'Мониторинг рынка', color: '#6B4E9B', bg: 'transparent', weight: '350' },
+        { name: 'БДР (мотивация)', color: '#2E7D5B', bg: 'transparent', weight: '350' },
+      ],
+      groups: [
+        { title: 'на сегодня', count: '1', rule: '#8A938E', tasks: [task('Свести капзатраты по двум площадкам', '', '2 ч', false, 3)] },
+        { title: 'в работе', count: '2', rule: '#8A938E', tasks: [
+          task('Запросить тариф на перевалку в Карасуке', '12.09', '1 ч', false, 2),
+          task('Сверить проектную мощность с ТЭО', '', '3 ч', false, 1),
+        ] },
+        { title: 'сделано', count: '2', rule: '#CCD2CC', tasks: [
+          task('Собрать посевные по зоне 150 км', '', '2,5 ч', true, 2),
+          task('Созвон по площадке в Бийске', '', '1 ч', true, 1),
+        ] },
+      ],
+      history: hist.map((m, i) => ({
+        count: m ? String(Math.round(m / 90)) : '',
+        h: Math.max(1, Math.round((m / hmax) * 64)) + 'px',
+        c: m ? color : '#CCD2CC',
+        date: ['20.07','27.07','03.08','10.08','17.08','24.08','31.08','07.09'][i],
+        hours: m ? (Math.round((m / 60) * 10) / 10).toString().replace('.', ',') : '—',
+      })),
+    }
+  }
+}
+</script>
+</body>
+</html>

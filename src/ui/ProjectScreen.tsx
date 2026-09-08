@@ -183,6 +183,9 @@ function Detail({ project, tasks }: { project: Project; tasks: Task[] }) {
         <div className="eyebrow pb-1.5">история по неделям</div>
         <div className="h-px w-full" style={{ backgroundColor: 'var(--color-ink3)' }} />
         <div className="flex items-end gap-2 overflow-x-auto pt-3">
+          <div className="flex w-[34px] shrink-0 flex-col items-end justify-end self-stretch pb-[30px]">
+            <span className="num text-[10.5px] text-ink4">{fmtHours(maxHist)} ч</span>
+          </div>
           {history.map((h) => (
             <div key={h.weekStart.toISOString()} className="flex w-[54px] flex-col items-center">
               <span className="num pb-1 text-[11px] text-ink3">{h.count || ''}</span>

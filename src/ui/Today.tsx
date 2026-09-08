@@ -81,7 +81,10 @@ export function Today({
         </p>
       )}
 
-      <div className="px-3 py-1 min-h-[52px]">
+      <div
+        className="px-3 py-1 min-h-[52px]"
+        style={{ borderBottom: tasks.length ? '1px solid var(--color-rule2)' : 'none' }}
+      >
         {tasks.map((t) => (
           <div
             key={t.id}

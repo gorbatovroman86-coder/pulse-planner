@@ -126,7 +126,7 @@ export function WeekScreen({
             <span className="truncate text-[13px]">{r.project.name}</span>
             <span className="relative hidden h-[12px] items-center sm:flex">
               <span
-                className="absolute inset-y-[1px] left-0"
+                className="absolute inset-y-[3px] left-0"
                 style={{
                   width: `${Math.max(r.minutes ? 1.5 : 0, (r.minutes / maxMinutes) * 100)}%`,
                   backgroundColor: r.project.color,
