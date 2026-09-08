@@ -2,32 +2,40 @@ import { STRIP_DAYS } from '../lib/derive'
 import { DAY, fmtHours, startOfDay } from '../lib/dates'
 
 /**
- * Пигмент проекта — вертикальная шкала внимания: налита доверху у свежего,
- * осела к донышку у забытого. Цвет читается всегда.
+ * Пульс недели: сколько внимания вложено против бюджета.
+ * Одна полоса — одно чтение. Дорожка = бюджет, заливка = факт,
+ * перебор — насечка поверх полной полосы.
  */
-export function Pigment({
+export function Gauge({
+  investedMinutes,
+  budgetMinutes,
   color,
-  days,
-  cooldown,
-  height = 30,
+  width = 72,
 }: {
+  investedMinutes: number
+  budgetMinutes: number
   color: string
-  days: number | null
-  cooldown: number
-  height?: number
+  width?: number
 }) {
-  const level =
-    days === null ? 0.24 : Math.max(0.24, Math.min(1, 1 - days / Math.max(1, cooldown)))
+  const share = budgetMinutes > 0 ? investedMinutes / budgetMinutes : 0
+  const over = share > 1
+  const fill = Math.min(1, share)
   return (
     <span
-      aria-hidden
-      className="relative block w-[4px] shrink-0 overflow-hidden rounded-full"
-      style={{ height, backgroundColor: `color-mix(in oklab, ${color} 30%, #fff)` }}
+      className="relative block shrink-0 overflow-hidden rounded-full"
+      style={{ width, height: 6, backgroundColor: 'var(--color-line2)' }}
+      title={`${fmtHours(investedMinutes)} из ${fmtHours(budgetMinutes)} ч за неделю`}
     >
       <span
-        className="absolute bottom-0 left-0 w-full rounded-full transition-[height] duration-500"
-        style={{ height: `${level * 100}%`, backgroundColor: color }}
+        className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500"
+        style={{ width: `${fill * 100}%`, backgroundColor: color }}
       />
+      {over && (
+        <span
+          className="absolute inset-y-0 right-0 rounded-full"
+          style={{ width: 6, backgroundColor: 'var(--color-alarm)' }}
+        />
+      )}
     </span>
   )
 }
@@ -42,35 +50,28 @@ export function Dot({ color, size = 8 }: { color: string; size?: number }) {
   )
 }
 
-/** Приоритет: три засечки. Заполнено столько, насколько задача важна. */
+/** Приоритет: точка. Показывается только там, где он поднят. */
 export function PriorityMark({ p }: { p: 1 | 2 | 3 }) {
-  const filled = 4 - p
   if (p === 3) return null
   return (
-    <span className="inline-flex shrink-0 items-end gap-[2px]" title={`Приоритет ${p}`}>
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="block w-[2px] rounded-full"
-          style={{
-            height: 4 + i * 3,
-            backgroundColor: i < filled ? 'var(--color-alarm)' : 'transparent',
-          }}
-        />
-      ))}
-    </span>
+    <span
+      className="inline-block h-[6px] w-[6px] shrink-0 rounded-full"
+      style={{ backgroundColor: p === 1 ? 'var(--color-alarm)' : 'var(--color-ink4)' }}
+      title={p === 1 ? 'Важно' : 'Средний приоритет'}
+    />
   )
 }
 
 /**
- * Лента касаний — подпись проекта. Столбик на каждый из 21 дня,
- * высота = закрытые часы. Провал виден без чтения текста.
+ * Лента касаний: столбик на каждый из 21 дня, высота = закрытые часы.
+ * Живёт там, где смотрят на один проект: семь таких лент подряд
+ * в общем списке превращались в шум.
  */
 export function Strip({
   data,
   color,
-  height = 26,
-  cell = 4,
+  height = 28,
+  cell = 5,
   gap = 3,
   animateLast = false,
 }: {
@@ -119,7 +120,7 @@ export function Strip({
   )
 }
 
-/** Вложено против бюджета: дробь, а не полоса. Перебор — другими чернилами. */
+/** Вложено против бюджета числом — там, где нужна точность. */
 export function BudgetFraction({
   investedMinutes,
   budgetMinutes,

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { Task } from '../types'
 import type { Pulse } from '../lib/derive'
-import { fmtDate, plural } from '../lib/dates'
-import { BudgetFraction, Pigment, Strip } from './atoms'
+import { fmtDate, fmtHours, plural } from '../lib/dates'
+import { BudgetFraction, Gauge, Strip } from './atoms'
 import { TaskLine } from './TaskLine'
 import { addTask, touchProject } from '../data/store'
 import { useFlip } from './useFlip'
@@ -30,8 +30,8 @@ export function Ledger({
     })
   }, [revealId])
 
-  const coldCount = pulses.filter((p) => p.cold).length
-  let dividerDrawn = false
+  const cold = pulses.filter((p) => p.cold)
+  const warm = pulses.filter((p) => !p.cold)
 
   function toggle(id: string) {
     setOpen((prev) => {
@@ -41,35 +41,32 @@ export function Ledger({
     })
   }
 
+  const row = (p: Pulse) => (
+    <Row
+      key={p.project.id}
+      pulse={p}
+      expanded={open.has(p.project.id)}
+      onToggle={() => toggle(p.project.id)}
+      warmed={warmedId === p.project.id}
+      bind={bindRow(p.project.id)}
+      onOpenProject={onOpenProject}
+    />
+  )
+
   return (
     <section aria-label="Проекты" className="card overflow-hidden">
-      {coldCount > 0 && (
-        <SectionHead
-          title="Остыли"
-          count={coldCount}
-          hint="дольше порога без касания"
-          alarm
-          first
-        />
+      {cold.length > 0 && (
+        <>
+          <SectionHead title="Остыли" count={cold.length} hint="давно без касания" alarm first />
+          {cold.map(row)}
+        </>
       )}
-
-      {pulses.map((p) => {
-        const showDivider = !p.cold && !dividerDrawn && coldCount > 0
-        if (showDivider) dividerDrawn = true
-        return (
-          <div key={p.project.id}>
-            {showDivider && <SectionHead title="В работе" count={pulses.length - coldCount} />}
-            <Row
-              pulse={p}
-              expanded={open.has(p.project.id)}
-              onToggle={() => toggle(p.project.id)}
-              warmed={warmedId === p.project.id}
-              bind={bindRow(p.project.id)}
-              onOpenProject={onOpenProject}
-            />
-          </div>
-        )
-      })}
+      {warm.length > 0 && (
+        <>
+          <SectionHead title="В работе" count={warm.length} first={cold.length === 0} />
+          {warm.map(row)}
+        </>
+      )}
 
       {pulses.length === 0 && (
         <p className="px-5 py-8 text-[14px] text-ink3">
@@ -95,7 +92,7 @@ function SectionHead({
 }) {
   return (
     <div
-      className={`flex items-center gap-2 px-5 pb-2 pt-4 ${first ? '' : 'border-t'}`}
+      className={`flex items-center gap-2 px-5 pb-2 pt-4 ${first ? '' : 'mt-1 border-t'}`}
       style={{ borderColor: 'var(--color-line2)' }}
     >
       <span
@@ -137,15 +134,20 @@ function Row({
       style={{ ['--pigment' as string]: p.color }}
     >
       <div
-        className="group flex cursor-pointer items-center gap-3.5 border-t px-5 py-3 transition-colors first:border-t-0 hover:bg-hover sm:gap-4"
+        className="group flex cursor-pointer items-center gap-3 border-t px-4 py-2.5 transition-colors hover:bg-hover sm:h-[52px] sm:px-5 sm:py-0"
         style={{ borderColor: 'var(--color-line2)' }}
         onClick={onToggle}
       >
-        <Pigment color={p.color} days={days} cooldown={p.cooldown_days} height={34} />
+        <span
+          className="h-[10px] w-[10px] shrink-0 rounded-full"
+          style={{ backgroundColor: p.color }}
+          aria-hidden
+        />
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-[15px] font-medium">{p.name}</span>
+          <div className="truncate text-[15px] font-medium">{p.name}</div>
+          {/* На телефоне метрики уезжают под название, иначе имя схлопывается */}
+          <div className="mt-0.5 flex items-center gap-2 sm:hidden">
             {pulse.noTasks && (
               <span
                 className="shrink-0 rounded-md px-1.5 py-[1px] text-[11.5px] font-medium"
@@ -154,83 +156,86 @@ function Row({
                 нет задач
               </span>
             )}
-          </div>
-          <div className="mt-[3px] flex flex-wrap items-center gap-x-2 text-[12.5px] text-ink3">
-            <span>
-              {pulse.openTasks.length === 0
-                ? 'нет открытых задач'
-                : `${pulse.openTasks.length} ${plural(pulse.openTasks.length, 'открытая', 'открытые', 'открытых')}`}
+            <span className="num text-[12.5px] text-ink3">
+              {pulse.investedMinutes
+                ? `${fmtHours(pulse.investedMinutes)}/${fmtHours(pulse.budgetMinutes)} ч`
+                : `0/${fmtHours(pulse.budgetMinutes)} ч`}
             </span>
-            {pulse.nextDue && (
-              <>
-                <span className="text-ink4">·</span>
-                <span style={{ color: pulse.overdue ? 'var(--color-alarm)' : undefined }}>
-                  ближайший <span className="num">{fmtDate(pulse.nextDue)}</span>
-                </span>
-              </>
-            )}
+            <span className="text-[12.5px]" style={{ color: cold ? 'var(--color-alarm)' : 'var(--color-ink3)' }}>
+              {days === null ? 'ни разу' : days === 0 ? 'сегодня' : `${days} ${plural(days, 'день', 'дня', 'дней')}`}
+            </span>
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-5 sm:gap-6">
-          <div className="hidden sm:block" title="Закрытые часы за три недели">
-            <Strip data={pulse.strip} color={p.color} animateLast={warmed} />
-          </div>
+        {pulse.noTasks && (
+          <span
+            className="hidden shrink-0 rounded-md px-1.5 py-[2px] text-[11.5px] font-medium sm:block"
+            style={{ backgroundColor: 'var(--color-alarm-soft)', color: 'var(--color-alarm)' }}
+          >
+            нет задач
+          </span>
+        )}
 
-          <div className="hidden w-[76px] text-right md:block" title="Вложено за неделю против бюджета">
-            <BudgetFraction
-              investedMinutes={pulse.investedMinutes}
-              budgetMinutes={pulse.budgetMinutes}
-              unit="ч"
-            />
-          </div>
-
-          <div className="w-[68px] text-right" title="Дней с последнего касания">
-            {days === null ? (
-              <span className="text-[13px] text-ink3">ни разу</span>
-            ) : days === 0 ? (
-              <span className="text-[13px] text-ink3">сегодня</span>
-            ) : (
-              <span className="whitespace-nowrap">
-                <span
-                  className="num text-[16px]"
-                  style={{ color: cold ? 'var(--color-alarm)' : 'var(--color-ink)', fontWeight: 500 }}
-                >
-                  {days}
-                </span>
-                <span className="pl-1 text-[12.5px] text-ink3">
-                  {plural(days, 'день', 'дня', 'дней')}
-                </span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onToggle()
-          }}
-          aria-label={expanded ? 'Свернуть' : 'Развернуть'}
-          className="shrink-0 text-ink4 transition-transform hover:text-ink2"
-          style={{ transform: expanded ? 'rotate(90deg)' : 'none' }}
+        <span
+          className="num hidden w-[54px] shrink-0 text-right text-[12.5px] md:block"
+          style={{ color: pulse.investedMinutes ? 'var(--color-ink2)' : 'var(--color-ink4)' }}
+          title="Вложено за неделю против бюджета"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+          {pulse.investedMinutes ? `${fmtHours(pulse.investedMinutes)}/${fmtHours(pulse.budgetMinutes)}` : '—'}
+        </span>
+
+        <span className="hidden sm:block">
+          <Gauge
+            investedMinutes={pulse.investedMinutes}
+            budgetMinutes={pulse.budgetMinutes}
+            color={p.color}
+          />
+        </span>
+
+        <span
+          className="hidden w-[86px] shrink-0 text-right text-[13.5px] sm:block"
+          title="С последнего касания"
+        >
+          {days === null ? (
+            <span className="text-ink3">ни разу</span>
+          ) : days === 0 ? (
+            <span className="text-ink2">сегодня</span>
+          ) : (
+            <span style={{ color: cold ? 'var(--color-alarm)' : 'var(--color-ink2)' }}>
+              <span className="num font-medium">{days}</span> {plural(days, 'день', 'дня', 'дней')}
+            </span>
+          )}
+        </span>
+
+        <span
+          className="shrink-0 text-ink4 transition-transform"
+          style={{ transform: expanded ? 'rotate(90deg)' : 'none' }}
+          aria-hidden
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14">
             <path d="M5 3 L9.5 7 L5 11" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </button>
+        </span>
       </div>
 
       <div className="expand" data-open={expanded} inert={!expanded} aria-hidden={!expanded}>
         <div>
-          <Expanded pulse={pulse} onOpenProject={onOpenProject} />
+          <Expanded pulse={pulse} onOpenProject={onOpenProject} warmed={warmed} />
         </div>
       </div>
     </div>
   )
 }
 
-function Expanded({ pulse, onOpenProject }: { pulse: Pulse; onOpenProject: (id: string) => void }) {
+function Expanded({
+  pulse,
+  onOpenProject,
+  warmed,
+}: {
+  pulse: Pulse
+  onOpenProject: (id: string) => void
+  warmed: boolean
+}) {
   const [draft, setDraft] = useState('')
   const p = pulse.project
 
@@ -242,7 +247,40 @@ function Expanded({ pulse, onOpenProject }: { pulse: Pulse; onOpenProject: (id: 
   }
 
   return (
-    <div className="px-5 pb-4 pl-[38px]">
+    <div
+      className="px-5 pb-4 pt-3"
+      style={{
+        backgroundColor: 'var(--color-sunken)',
+        boxShadow: `inset 3px 0 0 ${p.color}`,
+      }}
+    >
+      <div className="flex flex-wrap items-center gap-x-7 gap-y-2 pb-3">
+        <span className="flex items-baseline gap-1.5">
+          <span className="text-[12.5px] text-ink3">за неделю</span>
+          <BudgetFraction
+            investedMinutes={pulse.investedMinutes}
+            budgetMinutes={pulse.budgetMinutes}
+            size={13.5}
+            unit="ч"
+          />
+        </span>
+        <span className="flex items-center gap-2" title="Закрытые часы за три недели">
+          <span className="text-[12.5px] text-ink3">три недели</span>
+          <Strip data={pulse.strip} color={p.color} height={22} cell={4} gap={2} animateLast={warmed} />
+        </span>
+        {pulse.nextDue && (
+          <span className="flex items-baseline gap-1.5 text-[12.5px]">
+            <span className="text-ink3">ближайший срок</span>
+            <span
+              className="num text-[13.5px]"
+              style={{ color: pulse.overdue ? 'var(--color-alarm)' : 'var(--color-ink)' }}
+            >
+              {fmtDate(pulse.nextDue)}
+            </span>
+          </span>
+        )}
+      </div>
+
       {p.description && <p className="pb-2 text-[13px] text-ink3">{p.description}</p>}
 
       {pulse.openTasks.length > 0 ? (
@@ -277,7 +315,6 @@ function Expanded({ pulse, onOpenProject }: { pulse: Pulse; onOpenProject: (id: 
           }}
           placeholder={`Новая задача — ${p.name}`}
           className="field h-[34px] min-w-[200px] flex-1 text-[14px] placeholder:text-ink4"
-          style={{ backgroundColor: 'var(--color-sunken)' }}
         />
         <button onClick={add} className="btn btn-quiet">
           Добавить
