@@ -15,14 +15,14 @@ export const PIGMENTS = [
   '#5E5A52', // графит
 ]
 
-const SEED_PROJECTS: { name: string; description: string; budget: number }[] = [
-  { name: 'МЭЗ Карасук/Бийск', description: 'Оценка площадок под маслоэкстракционный завод', budget: 8 },
-  { name: 'Кукуруза', description: 'Сырьевые зоны под площадки приёмки', budget: 5 },
-  { name: 'Пульт «Ядро + Масло»', description: 'Модель накопления складов и работы завода', budget: 6 },
-  { name: 'БДР (мотивация)', description: 'Сравнение технологий переработки', budget: 4 },
-  { name: 'Агроаналитика Китай — РФ', description: 'Районные балансы НСО и Алтайского края', budget: 6 },
-  { name: 'Договоры НПК', description: 'Правовая работа по поставкам', budget: 3 },
-  { name: 'Мониторинг рынка', description: 'Сбор новостей зернового рынка', budget: 3 },
+const SEED_PROJECTS: { name: string; description: string; budget: number; emoji: string }[] = [
+  { name: 'МЭЗ Карасук/Бийск', description: 'Оценка площадок под маслоэкстракционный завод', budget: 8, emoji: '🏭' },
+  { name: 'Кукуруза', description: 'Сырьевые зоны под площадки приёмки', budget: 5, emoji: '🌽' },
+  { name: 'Пульт «Ядро + Масло»', description: 'Модель накопления складов и работы завода', budget: 6, emoji: '🫒' },
+  { name: 'БДР (мотивация)', description: 'Сравнение технологий переработки', budget: 4, emoji: '⚖️' },
+  { name: 'Агроаналитика Китай — РФ', description: 'Районные балансы НСО и Алтайского края', budget: 6, emoji: '🗺️' },
+  { name: 'Договоры НПК', description: 'Правовая работа по поставкам', budget: 3, emoji: '📄' },
+  { name: 'Мониторинг рынка', description: 'Сбор новостей зернового рынка', budget: 3, emoji: '📰' },
 ]
 
 /** Демонстрационные задачи — по одной на проект, помечены как пример.
@@ -43,10 +43,11 @@ export function buildSeed(): { projects: Project[]; tasks: Task[] } {
     id: uid(),
     name: p.name,
     color: PIGMENTS[i % PIGMENTS.length],
+    emoji: p.emoji,
     description: p.description,
     status: 'active',
     weekly_budget_hours: p.budget,
-    cooldown_days: 7,
+    cooldown_days: 2,
     last_touch_at: null,
     updated_at: now,
     deleted_at: null,

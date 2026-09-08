@@ -26,6 +26,7 @@ export function projectRow(p: Project): Record<string, unknown> {
     id: p.id,
     name: p.name,
     color: p.color,
+    emoji: p.emoji ?? '',
     description: p.description,
     status: p.status,
     weekly_budget_hours: p.weekly_budget_hours,
@@ -98,7 +99,7 @@ export async function pullAll(): Promise<{
   if (p.error) throw new Error(p.error.message)
   if (t.error) throw new Error(t.error.message)
   return {
-    projects: (p.data ?? []) as unknown as Project[],
+    projects: ((p.data ?? []) as unknown as Project[]).map((x) => ({ ...x, emoji: x.emoji ?? '' })),
     tasks: ((t.data ?? []) as unknown as Task[]).map((x) => ({
       ...x,
       subtasks: Array.isArray(x.subtasks) ? x.subtasks : [],

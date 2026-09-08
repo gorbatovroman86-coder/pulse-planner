@@ -12,6 +12,8 @@ export interface Project {
   id: string
   name: string
   color: string
+  /** Значок стикера на доске. Пусто — берётся значок состояния. */
+  emoji: string
   description: string
   status: ProjectStatus
   weekly_budget_hours: number

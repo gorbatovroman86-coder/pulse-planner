@@ -3,6 +3,7 @@ import type { Project, Task } from '../types'
 import { computePulse, inboxList, sortPulses, todayList, type Pulse } from '../lib/derive'
 import { fmtDuration, plural } from '../lib/dates'
 import { Ledger } from './Ledger'
+import { Board } from './Board'
 import { Today } from './Today'
 import { Inbox } from './Inbox'
 
@@ -36,6 +37,22 @@ export function PulseScreen({
   const forgotten = pulses.find((p) => p.cold) ?? null
   const plannedMinutes = today.reduce((s, t) => s + t.estimate_minutes, 0)
   const [reveal, setReveal] = useState<{ id: string; n: number } | null>(null)
+  const [view, setView] = useState<'board' | 'list'>(() => {
+    try {
+      return localStorage.getItem('puls.view') === 'list' ? 'list' : 'board'
+    } catch {
+      return 'board'
+    }
+  })
+
+  function switchView(v: 'board' | 'list') {
+    setView(v)
+    try {
+      localStorage.setItem('puls.view', v)
+    } catch {
+      /* приватный режим — вид просто не запомнится */
+    }
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-8">
@@ -50,12 +67,35 @@ export function PulseScreen({
 
       <div className="grid grid-cols-1 items-start gap-5 pb-16 xl:grid-cols-[minmax(0,1fr)_364px]">
         <div className="order-2 min-w-0 xl:order-1">
-          <Ledger
-            pulses={pulses}
-            warmedId={warmedId}
-            revealId={reveal ? reveal.id : null}
-            onOpenProject={onOpenProject}
-          />
+          <div className="flex items-center justify-end gap-1 pb-2">
+            {(['board', 'list'] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => switchView(v)}
+                className={`btn btn-sm ${view === v ? 'btn-quiet' : 'btn-ghost'}`}
+                style={view === v ? { color: 'var(--color-ink)' } : undefined}
+              >
+                {v === 'board' ? 'Доска' : 'Список'}
+              </button>
+            ))}
+          </div>
+
+          {view === 'board' ? (
+            <Board
+              pulses={pulses}
+              tasks={tasks}
+              warmedId={warmedId}
+              revealId={reveal ? reveal.id : null}
+              onOpenProject={onOpenProject}
+            />
+          ) : (
+            <Ledger
+              pulses={pulses}
+              warmedId={warmedId}
+              revealId={reveal ? reveal.id : null}
+              onOpenProject={onOpenProject}
+            />
+          )}
           <Inbox tasks={inbox} projects={active} />
         </div>
 
