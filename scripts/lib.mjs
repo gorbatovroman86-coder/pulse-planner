@@ -22,11 +22,11 @@ export function headers(key) {
 }
 
 /** Читает таблицу целиком, страницами по 1000 строк. */
-export async function readAll(url, key, table) {
+export async function readAll(url, key, table, orderBy = 'id') {
   const out = []
   const step = 1000
   for (let from = 0; ; from += step) {
-    const res = await fetch(`${url}/rest/v1/${table}?select=*&order=id.asc`, {
+    const res = await fetch(`${url}/rest/v1/${table}?select=*&order=${orderBy}.asc`, {
       headers: { ...headers(key), Range: `${from}-${from + step - 1}` },
     })
     if (!res.ok) throw new Error(`${table}: ${res.status} ${await res.text()}`)

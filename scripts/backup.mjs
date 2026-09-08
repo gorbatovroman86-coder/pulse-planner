@@ -12,7 +12,7 @@ const dir = process.argv[2] ?? 'backups'
 
 const projects = await readAll(url, key, 'projects')
 const tasks = await readAll(url, key, 'tasks')
-const settings = await readAll(url, key, 'settings')
+const settings = await readAll(url, key, 'settings', 'user_id')
 
 const snapshot = {
   exported_at: new Date().toISOString(),
