@@ -7,163 +7,148 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <style>
     body { margin: 0; }
-    a { color: #14453C; } a:hover { color: #0C2C27; }
-    .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-    .eyebrow { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8A938E; }
-    .row { display: grid; grid-template-columns: 4px minmax(120px, 1fr) 44px 56px 84px 136px 82px 24px; column-gap: 12px; align-items: center; height: 42px; padding: 0 8px; border-bottom: 1px solid #DCE0DA; }
+    a { color: #0F5F4F; } a:hover { color: #0C4E41; }
+    .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+    .card { background: #FFFFFF; border: 1px solid #E2E7EB; border-radius: 12px; box-shadow: 0 1px 2px rgba(17,24,32,.04), 0 10px 28px -16px rgba(17,24,32,.16); }
+    .count { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; font-weight: 500; color: #8A95A1; background: #F6F8F9; border-radius: 999px; padding: 1px 7px; }
+    .row { display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-top: 1px solid #EDF0F3; }
   </style>
 </helmet>
 
-<div style="width: 1440px; height: 900px; background: #E5E8E4; color: #161C1A; font-family: 'Geologica', ui-sans-serif, sans-serif; font-weight: 350; font-size: 14px; display: flex; flex-direction: column;">
+<div style="width: 1440px; height: 900px; background: #EEF1F3; color: #111820; font-family: 'Geologica', ui-sans-serif, sans-serif; font-size: 14.5px; display: flex; flex-direction: column;">
 
   <!-- Шапка -->
-  <div style="position: relative; display: flex; align-items: center; gap: 20px; height: 46px; padding: 0 24px;">
-    <span style="font-size: 17px; font-weight: 400; letter-spacing: 0.03em;">Пульс</span>
-    <div style="display: flex; align-items: center; gap: 4px;">
-      <span style="display: flex; align-items: baseline; gap: 6px; padding: 4px 8px; box-shadow: inset 0 -2px 0 #161C1A;"><span style="font-size: 13.5px; font-weight: 500;">Пульс</span><span class="num" style="font-size: 10px; color: #AEB6B1;">1</span></span>
-      <span style="display: flex; align-items: baseline; gap: 6px; padding: 4px 8px; color: #8A938E;"><span style="font-size: 13.5px;">Проект</span><span class="num" style="font-size: 10px; color: #AEB6B1;">2</span></span>
-      <span style="display: flex; align-items: baseline; gap: 6px; padding: 4px 8px; color: #8A938E;"><span style="font-size: 13.5px;">Неделя</span><span class="num" style="font-size: 10px; color: #AEB6B1;">3</span></span>
+  <div style="position: relative; display: flex; align-items: center; gap: 20px; padding: 10px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E7EB;">
+    <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em;">Пульс</span>
+    <div style="display: flex; gap: 2px; padding: 3px; background: #F6F8F9; border-radius: 10px;">
+      <span style="padding: 4px 12px; border-radius: 7px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(17,24,32,.08); font-size: 13.5px; font-weight: 500;">Пульс</span>
+      <span style="padding: 4px 12px; border-radius: 7px; font-size: 13.5px; color: #8A95A1;">Проект</span>
+      <span style="padding: 4px 12px; border-radius: 7px; font-size: 13.5px; color: #8A95A1;">Неделя</span>
     </div>
     <div style="flex-grow: 1;"></div>
-    <span class="eyebrow" style="color: #14453C;">сохранено</span>
-    <span class="eyebrow" style="border: 1px solid #CCD2CC; padding: 4px 8px;">поиск /</span>
-    <span class="eyebrow" style="border: 1px solid #CCD2CC; padding: 4px 8px;">данные</span>
-    <span class="eyebrow" style="border: 1px solid #CCD2CC; padding: 4px 8px;">?</span>
-    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #14453C;"></div>
+    <span style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #57626E;">
+      <span style="width: 6px; height: 6px; border-radius: 999px; background: #0F5F4F;"></span>сохранено
+    </span>
+    <span style="font-size: 13.5px; font-weight: 500; color: #8A95A1;">поиск</span>
+    <span style="padding: 5px 12px; border: 1px solid #E2E7EB; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #57626E;">данные</span>
+    <div style="position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: #0F5F4F;"></div>
   </div>
 
-  <!-- Быстрый ввод -->
-  <div style="padding: 16px 24px 0;">
-    <div style="display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 12px; border: 1px solid #CCD2CC; background: #F2F4F1;">
-      <span class="eyebrow">новая задача</span>
-      <span style="flex-grow: 1; color: #AEB6B1;">согласовать ПСР по Карасуку завтра !1 #МЭЗ 90м</span>
-      <span class="eyebrow" style="border: 1px solid #CCD2CC; padding: 4px 8px;">добавить</span>
+  <div style="padding: 20px 32px 0;">
+    <!-- Быстрый ввод -->
+    <div class="card" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px;">
+      <span style="color: #AEB8C2; font-size: 17px; line-height: 1;">+</span>
+      <span style="flex-grow: 1; color: #AEB8C2; font-size: 15px;">Новая задача — «согласовать ПСР завтра !1 #МЭЗ 90м»</span>
+      <span class="num" style="padding: 2px 6px; background: #F6F8F9; border-radius: 6px; font-size: 11px; color: #AEB8C2;">N</span>
+      <span style="padding: 7px 14px; background: #0F5F4F; color: #fff; border-radius: 8px; font-size: 13.5px; font-weight: 500;">Добавить</span>
     </div>
-  </div>
 
-  <!-- Строка-вывод -->
-  <div style="padding: 18px 24px 0;">
-    <div style="font-size: 19px; font-weight: 300; line-height: 1.35;">
-      <span class="num" style="font-size: 21px; font-weight: 500; color: #A8452F;">3</span> проекта остыли<span style="color: #AEB6B1;">,</span>
-      у <span class="num" style="font-size: 21px; font-weight: 500;">1</span> нет открытых задач<span style="color: #AEB6B1;">,</span>
-      сегодня запланировано <span class="num" style="font-size: 21px; font-weight: 500;">4 ч 20 мин</span><span style="color: #AEB6B1;">.</span>
-    </div>
-    <div style="padding-top: 4px; font-size: 13.5px; color: #4E5A55;">
-      Дольше всех ждёт <span style="color: #161C1A; text-decoration: underline; text-decoration-color: #CCD2CC; text-underline-offset: 4px;">«БДР (мотивация)»</span> — <span class="num">23</span> дня<span style="color: #AEB6B1;">.</span>
-    </div>
-  </div>
-
-  <!-- Ведомость + Сегодня -->
-  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; align-items: start; padding: 18px 24px 0;">
-
-    <div>
-      <div class="row" style="height: auto; border-bottom: none; align-items: end; padding-bottom: 6px;">
-        <span></span>
-        <span class="eyebrow">проект</span>
-        <span class="eyebrow" style="text-align: right;">откр.</span>
-        <span class="eyebrow" style="text-align: right;">срок</span>
-        <span class="eyebrow" style="text-align: right;">вложено / бюджет, ч</span>
-        <span class="eyebrow">три недели</span>
-        <span class="eyebrow" style="text-align: right;">без касания</span>
-        <span></span>
+    <!-- Вердикт -->
+    <div style="padding: 26px 0 20px;">
+      <div style="font-size: 24px; font-weight: 400; line-height: 1.3;">
+        <span class="num" style="font-weight: 500; color: #C2410C;">3</span> проекта остыли<span style="color: #AEB8C2;">,</span>
+        сегодня запланировано <span class="num" style="font-weight: 500;">4 ч 20 мин</span><span style="color: #AEB8C2;">.</span>
       </div>
-      <div style="height: 1px; background: #8A938E;"></div>
-
-      <div style="display: flex; align-items: center; gap: 12px; padding: 8px 8px 4px;">
-        <span class="eyebrow" style="color: #A8452F;">остыли — 3</span>
-        <span style="flex-grow: 1; height: 1px; background: #CCD2CC;"></span>
-        <span style="font-size: 12px; color: #8A938E;">дольше порога без касания</span>
+      <div style="padding-top: 6px; font-size: 14px; color: #57626E;">
+        Дольше всех ждёт <span style="color: #111820; font-weight: 500; border-bottom: 2px solid #E2E7EB;">БДР (мотивация)</span> — <span class="num">23</span> дня<span style="color: #AEB8C2;">.</span>
       </div>
+    </div>
 
-      <sc-for list="{{cold}}" as="p" hint-placeholder-count="3">
-        <div class="row" style="background: transparent;">
-          <span style="position: relative; display: block; width: 4px; height: 26px; background: {{p.faint}};"><span style="position: absolute; bottom: 0; left: 0; width: 100%; height: {{p.level}}; background: {{p.color}};"></span></span>
-          <span style="display: flex; align-items: baseline; gap: 8px; min-width: 0;">
-            <span style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{p.name}}</span>
-            <sc-if value="{{p.empty}}" hint-placeholder-val="{{ false }}"><span class="eyebrow" style="border: 1px solid #A8452F; color: #A8452F; padding: 0 4px; flex-shrink: 0;">нет задач</span></sc-if>
-          </span>
-          <span class="num" style="font-size: 12.5px; text-align: right; color: {{p.openInk}};">{{p.open}}</span>
-          <span class="num" style="font-size: 12px; text-align: right; color: #8A938E;">{{p.due}}</span>
-          <span class="num" style="font-size: 12.5px; text-align: right;"><span style="color: {{p.investedInk}};">{{p.invested}}</span><span style="color: #AEB6B1;">/{{p.budget}}</span></span>
-          <span style="display: flex; align-items: flex-end; gap: 2px; height: 22px;">
-            <sc-for list="{{p.strip}}" as="b" hint-placeholder-count="21">
-              <span style="position: relative; display: flex; align-items: flex-end; width: 4px; height: 22px;"><span style="width: 4px; height: {{b.h}}; background: {{b.c}};"></span><sc-if value="{{b.monday}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; bottom: -3px; left: 0; width: 100%; height: 2px; background: #AEB6B1;"></span></sc-if></span>
-            </sc-for>
-          </span>
-          <span style="text-align: right; white-space: nowrap;"><span class="num" style="font-size: 17px; font-weight: 500; color: #A8452F;">{{p.days}}</span><span class="eyebrow" style="margin-left: 4px;">{{p.dayWord}}</span></span>
-          <span style="justify-self: end; color: #8A938E;">›</span>
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 364px; gap: 20px; align-items: start;">
+
+      <!-- Ведомость -->
+      <div class="card" style="overflow: hidden;">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 16px 20px 8px;">
+          <span style="font-size: 13px; font-weight: 500; color: #C2410C;">Остыли</span>
+          <span class="count">3</span>
+          <span style="padding-left: 4px; font-size: 12.5px; color: #AEB8C2;">дольше порога без касания</span>
         </div>
-      </sc-for>
 
-      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 8px 4px;">
-        <span class="eyebrow">в работе</span>
-        <span style="flex-grow: 1; height: 1px; background: #CCD2CC;"></span>
-      </div>
-
-      <sc-for list="{{warm}}" as="p" hint-placeholder-count="4">
-        <div class="row" style="background: #F2F4F1;">
-          <span style="position: relative; display: block; width: 4px; height: 26px; background: {{p.faint}};"><span style="position: absolute; bottom: 0; left: 0; width: 100%; height: {{p.level}}; background: {{p.color}};"></span></span>
-          <span style="display: flex; align-items: baseline; gap: 8px; min-width: 0;">
-            <span style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{p.name}}</span>
-          </span>
-          <span class="num" style="font-size: 12.5px; text-align: right;">{{p.open}}</span>
-          <span class="num" style="font-size: 12px; text-align: right; color: {{p.dueInk}};">{{p.due}}</span>
-          <span class="num" style="font-size: 12.5px; text-align: right;"><span style="color: {{p.investedInk}}; font-weight: 500;">{{p.invested}}</span><span style="color: #AEB6B1;">/{{p.budget}}</span></span>
-          <span style="display: flex; align-items: flex-end; gap: 2px; height: 22px;">
-            <sc-for list="{{p.strip}}" as="b" hint-placeholder-count="21">
-              <span style="position: relative; display: flex; align-items: flex-end; width: 4px; height: 22px;"><span style="width: 4px; height: {{b.h}}; background: {{b.c}};"></span><sc-if value="{{b.monday}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; bottom: -3px; left: 0; width: 100%; height: 2px; background: #AEB6B1;"></span></sc-if></span>
-            </sc-for>
-          </span>
-          <span style="text-align: right; white-space: nowrap;"><span class="num" style="font-size: {{p.daySize}}; color: {{p.dayInk}};">{{p.days}}</span><span class="eyebrow" style="margin-left: 4px;">{{p.dayWord}}</span></span>
-          <span style="justify-self: end; color: #8A938E;">›</span>
-        </div>
-      </sc-for>
-
-      <div style="display: flex; align-items: center; gap: 12px; padding: 28px 8px 6px;">
-        <span class="eyebrow">входящие</span>
-        <span class="num" style="font-size: 11px; color: #8A938E;">2</span>
-        <span style="flex-grow: 1; height: 1px; background: #CCD2CC;"></span>
-        <span style="font-size: 12px; color: #8A938E;">задачи без проекта — раскидай по проектам</span>
-      </div>
-      <div style="height: 1px; background: #8A938E;"></div>
-      <div style="display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-bottom: 1px solid #DCE0DA;">
-        <span style="width: 15px; height: 15px; border: 1px solid #8A938E;"></span>
-        <span style="display: flex; gap: 2px;"><span style="width: 2px; height: 9px; background: #4E5A55;"></span><span style="width: 2px; height: 9px; background: #CCD2CC;"></span><span style="width: 2px; height: 9px; background: #CCD2CC;"></span></span>
-        <span style="flex-grow: 1; font-size: 13.5px;">уточнить ставку ЖД до Забайкальска</span>
-        <span class="num" style="font-size: 11.5px; color: #4E5A55;">0,5 ч</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-bottom: 1px solid #DCE0DA;">
-        <span style="width: 15px; height: 15px; border: 1px solid #8A938E;"></span>
-        <span style="display: flex; gap: 2px;"><span style="width: 2px; height: 9px; background: #4E5A55;"></span><span style="width: 2px; height: 9px; background: #4E5A55;"></span><span style="width: 2px; height: 9px; background: #CCD2CC;"></span></span>
-        <span style="flex-grow: 1; font-size: 13.5px;">перечитать протокол по элеватору Баган</span>
-        <span class="num" style="font-size: 11.5px; color: #4E5A55;">1 ч</span>
-      </div>
-    </div>
-
-    <!-- Сегодня -->
-    <div style="border: 1px solid #CCD2CC; background: #F2F4F1;">
-      <div style="display: flex; align-items: baseline; justify-content: space-between; height: 34px; padding: 0 12px; border-bottom: 1px solid #8A938E;">
-        <span class="eyebrow">сегодня</span>
-        <span class="num" style="font-size: 13px;">4 ч 20 мин</span>
-      </div>
-      <div style="display: flex; flex-direction: column; padding: 4px 12px 12px;">
-        <sc-for list="{{today}}" as="t" hint-placeholder-count="4">
-          <div style="display: flex; align-items: flex-start; gap: 10px; padding: 7px 0;">
-            <span style="width: 15px; height: 15px; border: 1px solid #8A938E; flex-shrink: 0;"></span>
-            <span style="display: flex; gap: 2px; flex-shrink: 0; padding-top: 3px;">
-              <span style="width: 2px; height: 9px; background: {{t.p1}};"></span><span style="width: 2px; height: 9px; background: {{t.p2}};"></span><span style="width: 2px; height: 9px; background: {{t.p3}};"></span>
+        <sc-for list="{{cold}}" as="p" hint-placeholder-count="3">
+          <div class="row">
+            <span style="position: relative; display: block; width: 4px; height: 34px; border-radius: 999px; background: {{p.faint}}; overflow: hidden;">
+              <span style="position: absolute; bottom: 0; left: 0; width: 100%; height: {{p.level}}; border-radius: 999px; background: {{p.color}};"></span>
             </span>
-            <span style="width: 7px; height: 7px; flex-shrink: 0; margin-top: 4px; background: {{t.color}};"></span>
-            <span style="flex-grow: 1; font-size: 13.5px; line-height: 1.35;">{{t.title}}</span>
-            <span class="num" style="font-size: 11.5px; color: #4E5A55; flex-shrink: 0;">{{t.est}}</span>
+            <div style="flex-grow: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 15px; font-weight: 500;">{{p.name}}</span>
+                <sc-if value="{{p.empty}}" hint-placeholder-val="{{ false }}">
+                  <span style="padding: 1px 6px; border-radius: 6px; background: #FBEDE6; color: #C2410C; font-size: 11.5px; font-weight: 500;">нет задач</span>
+                </sc-if>
+              </div>
+              <div style="padding-top: 3px; font-size: 12.5px; color: #8A95A1;">{{p.meta}}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 24px;">
+              <span style="display: flex; align-items: flex-end; gap: 3px; height: 26px;">
+                <sc-for list="{{p.strip}}" as="b" hint-placeholder-count="21">
+                  <span style="width: 4px; height: {{b.h}}; border-radius: 999px; background: {{b.c}};"></span>
+                </sc-for>
+              </span>
+              <span class="num" style="width: 76px; text-align: right; font-size: 14px;"><span style="font-weight: 500; color: {{p.investedInk}};">{{p.invested}}</span><span style="color: #AEB8C2;"> / {{p.budget}} ч</span></span>
+              <span style="width: 68px; text-align: right; white-space: nowrap;">
+                <span class="num" style="font-size: 16px; font-weight: 500; color: #C2410C;">{{p.days}}</span>
+                <span style="padding-left: 4px; font-size: 12.5px; color: #8A95A1;">{{p.dayWord}}</span>
+              </span>
+              <span style="color: #AEB8C2;">›</span>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="display: flex; align-items: center; gap: 8px; padding: 16px 20px 8px; border-top: 1px solid #EDF0F3;">
+          <span style="font-size: 13px; font-weight: 500; color: #57626E;">В работе</span>
+          <span class="count">4</span>
+        </div>
+
+        <sc-for list="{{warm}}" as="p" hint-placeholder-count="4">
+          <div class="row">
+            <span style="position: relative; display: block; width: 4px; height: 34px; border-radius: 999px; background: {{p.faint}}; overflow: hidden;">
+              <span style="position: absolute; bottom: 0; left: 0; width: 100%; height: {{p.level}}; border-radius: 999px; background: {{p.color}};"></span>
+            </span>
+            <div style="flex-grow: 1; min-width: 0;">
+              <div style="font-size: 15px; font-weight: 500;">{{p.name}}</div>
+              <div style="padding-top: 3px; font-size: 12.5px; color: #8A95A1;">{{p.meta}}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 24px;">
+              <span style="display: flex; align-items: flex-end; gap: 3px; height: 26px;">
+                <sc-for list="{{p.strip}}" as="b" hint-placeholder-count="21">
+                  <span style="width: 4px; height: {{b.h}}; border-radius: 999px; background: {{b.c}};"></span>
+                </sc-for>
+              </span>
+              <span class="num" style="width: 76px; text-align: right; font-size: 14px;"><span style="font-weight: 500;">{{p.invested}}</span><span style="color: #AEB8C2;"> / {{p.budget}} ч</span></span>
+              <span style="width: 68px; text-align: right; white-space: nowrap;">
+                <span class="num" style="font-size: 16px; font-weight: 500;">{{p.days}}</span>
+                <span style="padding-left: 4px; font-size: 12.5px; color: #8A95A1;">{{p.dayWord}}</span>
+              </span>
+              <span style="color: #AEB8C2;">›</span>
+            </div>
           </div>
         </sc-for>
       </div>
-    </div>
 
+      <!-- Сегодня -->
+      <div class="card" style="overflow: hidden;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 14px 16px 8px;">
+          <span style="font-size: 15px; font-weight: 500;">Сегодня</span>
+          <span class="num" style="font-size: 14px; color: #57626E;">4 ч 20 мин</span>
+        </div>
+        <div style="padding: 0 8px 12px;">
+          <sc-for list="{{today}}" as="t" hint-placeholder-count="3">
+            <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px; border-radius: 8px;">
+              <span style="width: 19px; height: 19px; border: 1.5px solid #AEB8C2; border-radius: 999px; flex-shrink: 0;"></span>
+              <span style="width: 7px; height: 7px; margin-top: 6px; border-radius: 999px; flex-shrink: 0; background: {{t.color}};"></span>
+              <div style="flex-grow: 1; min-width: 0;">
+                <div style="font-size: 14.5px; line-height: 1.35;">{{t.title}}</div>
+                <div class="num" style="padding-top: 4px; font-size: 12.5px; color: #8A95A1;">{{t.est}}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 </x-dc>
@@ -172,59 +157,44 @@
 class Component extends DCLogic {
   strip(vals, color) {
     const max = Math.max(60, ...vals)
-    // Понедельники: лента кончается сегодняшним днём, идём назад по 7
     return vals.map((v, i) => ({
-      h: (v > 0 ? Math.max(3, Math.round((v / max) * 22)) : 1) + 'px',
-      c: v > 0 ? (i === vals.length - 1 ? color : this.mix(color)) : '#CCD2CC',
-      monday: (vals.length - 1 - i) % 7 === 3,
+      h: (v > 0 ? Math.max(4, Math.round((v / max) * 26)) : 2) + 'px',
+      c: v > 0 ? (i === vals.length - 1 ? color : this.mix(color, 0.55)) : '#E2E7EB',
     }))
   }
-  mix(hex) {
+  mix(hex, k) {
     const n = parseInt(hex.slice(1), 16)
     const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
-    const m = (c, p) => Math.round(c * 0.62 + p * 0.38)
-    return `rgb(${m(r, 229)}, ${m(g, 232)}, ${m(b, 228)})`
-  }
-  faint(hex) {
-    const n = parseInt(hex.slice(1), 16)
-    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
-    const m = (c, p) => Math.round(c * 0.34 + p * 0.66)
-    return `rgb(${m(r, 229)}, ${m(g, 232)}, ${m(b, 228)})`
-  }
-  level(days, cooldown) {
-    return Math.round(Math.max(0.22, Math.min(1, 1 - days / cooldown)) * 100) + '%'
+    const m = (c) => Math.round(c * k + 255 * (1 - k))
+    return `rgb(${m(r)}, ${m(g)}, ${m(b)})`
   }
   make(o) {
     return {
       ...o,
-      faint: this.faint(o.color),
-      level: this.level(o.days, 7),
+      faint: this.mix(o.color, 0.3),
+      level: Math.round(Math.max(0.24, Math.min(1, 1 - o.days / 7)) * 100) + '%',
       strip: this.strip(o.vals, o.color),
-      openInk: o.open === '0' ? '#AEB6B1' : '#161C1A',
-      investedInk: o.invested === '0' ? '#AEB6B1' : '#161C1A',
-      dueInk: o.overdue ? '#A8452F' : '#8A938E',
-      daySize: o.days === 0 ? '12px' : '17px',
-      dayInk: o.days === 0 ? '#8A938E' : '#4E5A55',
+      investedInk: o.invested === '0' ? '#AEB8C2' : '#111820',
     }
   }
   renderVals() {
     const z = (n) => new Array(n).fill(0)
     return {
       cold: [
-        this.make({ name: 'БДР (мотивация)', color: '#2E7D5B', open: '1', due: '—', invested: '0', budget: '4', days: 23, dayWord: 'дня', vals: z(21), empty: false }),
-        this.make({ name: 'Мониторинг рынка', color: '#6B4E9B', open: '0', due: '—', invested: '0', budget: '3', days: 14, dayWord: 'дней', vals: z(21), empty: true }),
-        this.make({ name: 'Договоры НПК', color: '#3B5EA6', open: '2', due: '15.09', invested: '0', budget: '3', days: 9, dayWord: 'дней', vals: [0,0,0,0,0,0,0,0,0,0,0,45,0,0,0,0,0,0,0,0,0], empty: false }),
+        this.make({ name: 'БДР (мотивация)', color: '#2E7D5B', meta: '1 открытая', invested: '0', budget: '4', days: 23, dayWord: 'дня', vals: z(21), empty: false }),
+        this.make({ name: 'Мониторинг рынка', color: '#6B4E9B', meta: 'нет открытых задач', invested: '0', budget: '3', days: 14, dayWord: 'дней', vals: z(21), empty: true }),
+        this.make({ name: 'Договоры НПК', color: '#3B5EA6', meta: '2 открытые · ближайший 15.09', invested: '0', budget: '3', days: 9, dayWord: 'дней', vals: [0,0,0,0,0,0,0,0,0,0,0,45,0,0,0,0,0,0,0,0,0], empty: false }),
       ],
       warm: [
-        this.make({ name: 'Пульт «Ядро + Масло»', color: '#6E7C22', open: '1', due: '—', invested: '0,5', budget: '6', days: 5, dayWord: 'дней', vals: [0,0,60,0,0,0,90,0,0,0,0,0,120,0,0,60,0,30,0,0,0] }),
-        this.make({ name: 'Кукуруза', color: '#B57A1F', open: '2', due: '09.09', invested: '1,5', budget: '5', days: 2, dayWord: 'дня', vals: [0,45,0,0,90,0,0,0,60,0,0,0,0,120,0,0,45,0,90,0,0] }),
-        this.make({ name: 'Агроаналитика Китай — РФ', color: '#2A6E86', open: '4', due: '10.09', invested: '2', budget: '6', days: 1, dayWord: 'день', vals: [60,0,0,120,0,0,0,90,0,0,60,0,0,0,150,0,0,90,0,120,0] }),
-        this.make({ name: 'МЭЗ Карасук/Бийск', color: '#A8452F', open: '3', due: '12.09', invested: '6,5', budget: '8', days: 0, dayWord: '', vals: [90,0,120,0,60,0,0,150,90,0,0,120,0,0,180,60,0,90,120,0,240] }),
+        this.make({ name: 'Пульт «Ядро + Масло»', color: '#6E7C22', meta: '1 открытая', invested: '0,5', budget: '6', days: 5, dayWord: 'дней', vals: [0,0,60,0,0,0,90,0,0,0,0,0,120,0,0,60,0,30,0,0,0] }),
+        this.make({ name: 'Кукуруза', color: '#B57A1F', meta: '2 открытые · ближайший 09.09', invested: '1,5', budget: '5', days: 2, dayWord: 'дня', vals: [0,45,0,0,90,0,0,0,60,0,0,0,0,120,0,0,45,0,90,0,0] }),
+        this.make({ name: 'Агроаналитика Китай — РФ', color: '#2A6E86', meta: '4 открытые · ближайший 10.09', invested: '2', budget: '6', days: 1, dayWord: 'день', vals: [60,0,0,120,0,0,0,90,0,0,60,0,0,0,150,0,0,90,0,120,0] }),
+        this.make({ name: 'МЭЗ Карасук/Бийск', color: '#A8452F', meta: '3 открытые · ближайший 12.09', invested: '6,5', budget: '8', days: 0, dayWord: 'сегодня', vals: [90,0,120,0,60,0,0,150,90,0,0,120,0,0,180,60,0,90,120,0,240] }),
       ],
       today: [
-        { title: 'Свести капзатраты по двум площадкам', est: '2 ч', color: '#A8452F', p1: '#4E5A55', p2: '#4E5A55', p3: '#4E5A55' },
-        { title: 'Обновить районный баланс НСО', est: '1,5 ч', color: '#2A6E86', p1: '#4E5A55', p2: '#4E5A55', p3: '#CCD2CC' },
-        { title: 'Позвонить на элеватор по остаткам', est: '0,8 ч', color: '#B57A1F', p1: '#4E5A55', p2: '#4E5A55', p3: '#CCD2CC' },
+        { title: 'Свести капзатраты по двум площадкам', est: '2 ч', color: '#A8452F' },
+        { title: 'Обновить районный баланс НСО', est: '1,5 ч', color: '#2A6E86' },
+        { title: 'Позвонить на элеватор по остаткам', est: '0,8 ч', color: '#B57A1F' },
       ],
     }
   }
