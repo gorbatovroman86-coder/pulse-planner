@@ -433,6 +433,36 @@ export async function sendMagicLink(email: string): Promise<void> {
   if (error) throw new Error(error.message)
 }
 
+/** Ссылка вернулась с ошибкой — вытаскиваем её из адреса, иначе вход молчит. */
+export function readAuthError(): string | null {
+  const from = (s: string) => new URLSearchParams(s.replace(/^[#?]/, ''))
+  for (const part of [window.location.hash, window.location.search]) {
+    if (!part) continue
+    const q = from(part)
+    const code = q.get('error_code') || q.get('error')
+    if (!code) continue
+    const text = q.get('error_description') || code
+    history.replaceState(null, '', window.location.pathname)
+    return decodeURIComponent(text.replace(/\+/g, ' '))
+  }
+  return null
+}
+
+/** Человеческий текст вместо английской строки от сервера. */
+export function explainAuthError(raw: string): string {
+  const s = raw.toLowerCase()
+  if (s.includes('rate limit')) {
+    return 'Слишком часто. Встроенная почта шлёт не больше двух писем в час — подожди или введи код из письма, которое уже пришло.'
+  }
+  if (s.includes('expired') || s.includes('invalid') || s.includes('access_denied')) {
+    return 'Ссылка уже использована или устарела: почтовые сканеры часто открывают её раньше человека. Введи код из письма — его они не трогают.'
+  }
+  if (s.includes('not found') || s.includes('signups not allowed')) {
+    return 'Такой почты в базе нет. Проверь адрес.'
+  }
+  return raw
+}
+
 export async function signOut() {
   if (!supabase) return
   await supabase.auth.signOut()

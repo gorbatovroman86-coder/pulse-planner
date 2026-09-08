@@ -114,48 +114,74 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 bg-paper/95 backdrop-blur-[2px]">
-        <div className="relative mx-auto flex w-full max-w-[1360px] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-1.5 sm:h-[46px] sm:flex-nowrap sm:gap-5 sm:px-6 sm:py-0">
-          <span className="text-[17px] leading-none" style={{ fontWeight: 400, letterSpacing: '0.03em' }}>
-            Пульс
-          </span>
+      <header
+        className="sticky top-0 z-30 border-b bg-surface/85 backdrop-blur-md"
+        style={{ borderColor: 'var(--color-line)' }}
+      >
+        <div className="relative mx-auto flex w-full max-w-[1280px] items-center gap-2 px-3 py-2.5 sm:gap-5 sm:px-8">
+          <span className="hidden shrink-0 text-[16px] font-semibold tracking-[-0.01em] sm:block">Пульс</span>
 
-          <nav className="flex items-center gap-1">
-            {TABS.map(([id, label, key]) => (
-              <button
-                key={id}
-                onClick={() => setScreen(id)}
-                className="group flex items-baseline gap-1.5 px-2 py-1"
-                style={{
-                  color: screen === id ? 'var(--color-ink)' : 'var(--color-ink3)',
-                  boxShadow: screen === id ? 'inset 0 -2px 0 var(--color-ink)' : 'none',
-                }}
-              >
-                <span className="text-[13.5px]" style={{ fontWeight: screen === id ? 500 : 350 }}>
+          <nav
+            className="flex shrink-0 items-center gap-0.5 rounded-[10px] p-[3px]"
+            style={{ backgroundColor: 'var(--color-sunken)' }}
+          >
+            {TABS.map(([id, label, key]) => {
+              const on = screen === id
+              return (
+                <button
+                  key={id}
+                  onClick={() => setScreen(id)}
+                  title={`Клавиша ${key}`}
+                  className="rounded-[7px] px-2 py-1 text-[13px] transition-colors sm:px-3 sm:text-[13.5px]"
+                  style={{
+                    fontWeight: on ? 500 : 400,
+                    color: on ? 'var(--color-ink)' : 'var(--color-ink3)',
+                    backgroundColor: on ? 'var(--color-surface)' : 'transparent',
+                    boxShadow: on ? '0 1px 2px rgba(17,24,32,.08)' : 'none',
+                  }}
+                >
                   {label}
-                </span>
-                <span className="num text-[10px] text-ink4">{key}</span>
-              </button>
-            ))}
+                </button>
+              )
+            })}
           </nav>
 
-          <div className="hidden flex-1 sm:block" />
+          <div className="flex-1" />
           <SyncLine state={sync} pending={pending} error={syncError} />
-          <div className="flex-1 sm:hidden" />
+
           <button
             onClick={() => setOverlay('search')}
-            className="eyebrow border border-rule px-2 py-1 hover:bg-card"
+            className="btn btn-ghost btn-sm"
+            aria-label="Поиск"
+            title="Поиск  /"
           >
-            поиск<span className="hidden sm:inline"> /</span>
+            <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden>
+              <circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M10.4 10.4 L14 14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
           </button>
           <DataMenu signedIn={signedIn} />
-          <button onClick={() => setOverlay('help')} className="eyebrow border border-rule px-2 py-1 hover:bg-card">
-            ?
+          <button
+            onClick={() => setOverlay('help')}
+            className="btn btn-ghost btn-sm hidden sm:inline-flex"
+            aria-label="Клавиши"
+            title="Клавиши  ?"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden>
+              <path
+                d="M5.8 6.1a2.2 2.2 0 1 1 2.7 2.15c-.4.1-.5.4-.5.75v.6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+              <circle cx="8" cy="12.1" r="0.95" fill="currentColor" />
+            </svg>
           </button>
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-[1360px] px-4 pt-4 sm:px-6">
+      <div className="mx-auto w-full max-w-[1280px] px-4 pt-5 sm:px-8">
         <QuickAdd
           projects={active}
           focusSignal={focusSignal}
@@ -163,7 +189,7 @@ export default function App() {
         />
       </div>
 
-      <main className="pt-2">
+      <main className="pt-1">
         {screen === 'pulse' && (
           <PulseScreen
             projects={state.projects}

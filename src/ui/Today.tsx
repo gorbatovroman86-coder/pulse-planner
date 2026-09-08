@@ -59,32 +59,29 @@ export function Today({
       }}
       onDragLeave={() => setHot(false)}
       onDrop={(e) => onDrop(e, null)}
-      className="border transition-colors"
-      style={{
-        borderColor: hot ? 'var(--color-deep)' : 'var(--color-rule)',
-        backgroundColor: hot ? 'color-mix(in oklab, var(--color-deep) 6%, var(--color-card))' : 'var(--color-card)',
-      }}
+      className="card overflow-hidden transition-shadow"
+      style={hot ? { borderColor: 'var(--color-accent)', boxShadow: 'var(--shadow-pop)' } : undefined}
     >
-      <header className="flex items-baseline justify-between px-3 h-[34px] border-b" style={{ borderColor: 'var(--color-ink3)' }}>
-        <span className="eyebrow">сегодня</span>
-        <span className="num text-[13px]" style={{ color: overloaded ? 'var(--color-warm)' : 'var(--color-ink)' }}>
+      <header className="flex items-baseline justify-between px-4 pb-2 pt-3.5">
+        <span className="text-[15px] font-medium">Сегодня</span>
+        <span
+          className="num text-[14px]"
+          style={{ color: overloaded ? 'var(--color-alarm)' : 'var(--color-ink2)' }}
+        >
           {total > 0 ? fmtDuration(total) : '—'}
         </span>
       </header>
 
       {overloaded && (
         <p
-          className="px-3 py-1.5 text-[12px] border-b"
-          style={{ color: 'var(--color-warm)', borderColor: 'var(--color-rule2)' }}
+          className="mx-4 mb-2 rounded-lg px-3 py-2 text-[12.5px]"
+          style={{ backgroundColor: 'var(--color-alarm-soft)', color: 'var(--color-alarm)' }}
         >
-          Ты перепланировал день: больше 6 часов.
+          Ты перепланировал день: больше шести часов.
         </p>
       )}
 
-      <div
-        className="px-3 py-1 min-h-[52px]"
-        style={{ borderBottom: tasks.length ? '1px solid var(--color-rule2)' : 'none' }}
-      >
+      <div className="px-2 pb-3">
         {tasks.map((t) => (
           <div
             key={t.id}
@@ -97,7 +94,7 @@ export function Today({
               onDrop(e, t.id)
             }}
             style={{
-              borderTop: overId === t.id ? '2px solid var(--color-deep)' : '2px solid transparent',
+              borderTop: overId === t.id ? '2px solid var(--color-accent)' : '2px solid transparent',
             }}
           >
             <TaskLine
@@ -118,8 +115,8 @@ export function Today({
         ))}
 
         {tasks.length === 0 && (
-          <p className="py-6 text-center text-[12.5px] text-ink3">
-            Перетащи сюда задачу из проекта
+          <p className="px-3 py-6 text-center text-[13px] leading-relaxed text-ink3">
+            Пусто. Перетащи сюда задачу из проекта
             <br />
             или нажми «сегодня» в её строке.
           </p>

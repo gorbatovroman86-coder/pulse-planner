@@ -31,36 +31,33 @@ export function PulseScreen({
 
   const cold = pulses.filter((p) => p.cold).length
   const untouched = pulses.filter((p) => p.lastTouch === null).length
-  // Самый забытый проект — тот, что дольше всех без касания.
   const forgotten = pulses.find((p) => p.cold) ?? null
-  const [reveal, setReveal] = useState<{ id: string; n: number } | null>(null)
-  const noTasks = pulses.filter((p) => p.noTasks).length
   const plannedMinutes = today.reduce((s, t) => s + t.estimate_minutes, 0)
+  const [reveal, setReveal] = useState<{ id: string; n: number } | null>(null)
 
   return (
-    <div className="mx-auto w-full max-w-[1360px] px-4 sm:px-6">
+    <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-8">
       <Verdict
         cold={cold}
         untouched={untouched}
-        noTasks={noTasks}
-        plannedMinutes={plannedMinutes}
         planned={today.length}
+        plannedMinutes={plannedMinutes}
         forgotten={forgotten}
         onReveal={(id) => setReveal((r) => ({ id, n: (r?.n ?? 0) + 1 }))}
       />
 
-      <div className="grid grid-cols-1 items-start gap-7 pb-16 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid grid-cols-1 items-start gap-5 pb-16 xl:grid-cols-[minmax(0,1fr)_364px]">
         <div className="order-2 min-w-0 xl:order-1">
           <Ledger
             pulses={pulses}
             warmedId={warmedId}
-            revealId={reveal ? `${reveal.id}` : null}
+            revealId={reveal ? reveal.id : null}
             onOpenProject={onOpenProject}
           />
           <Inbox tasks={inbox} projects={active} />
         </div>
 
-        <div className="order-1 min-w-0 xl:order-2 xl:sticky xl:top-[62px]">
+        <div className="order-1 min-w-0 xl:order-2 xl:sticky xl:top-[74px]">
           <Today tasks={today} projects={projects} landedId={landedId} selectedId={selectedId} />
         </div>
       </div>
@@ -71,7 +68,6 @@ export function PulseScreen({
 function Verdict({
   cold,
   untouched,
-  noTasks,
   planned,
   plannedMinutes,
   forgotten,
@@ -79,83 +75,64 @@ function Verdict({
 }: {
   cold: number
   untouched: number
-  noTasks: number
   planned: number
   plannedMinutes: number
   forgotten: Pulse | null
   onReveal: (id: string) => void
 }) {
-  const parts: React.ReactNode[] = []
-
-  if (untouched > 0 && untouched === cold) {
-    parts.push(
-      <span key="cold">
-        <b className="num text-[21px] font-medium" style={{ color: 'var(--color-warm)' }}>{untouched}</b>{' '}
-        {plural(untouched, 'проект', 'проекта', 'проектов')} ещё ни разу не трогали
-      </span>,
-    )
-  } else if (cold > 0) {
-    parts.push(
-      <span key="cold">
-        <b className="num text-[21px] font-medium" style={{ color: 'var(--color-warm)' }}>{cold}</b>{' '}
-        {plural(cold, 'проект остыл', 'проекта остыли', 'проектов остыли')}
-      </span>,
-    )
-  } else {
-    parts.push(<span key="cold">все проекты в работе</span>)
-  }
-
-  if (noTasks > 0) {
-    parts.push(
-      <span key="nt">
-        у <b className="num text-[21px] font-medium">{noTasks}</b>{' '}
-        {plural(noTasks, 'нет открытых задач', 'нет открытых задач', 'нет открытых задач')}
-      </span>,
-    )
-  }
-
-  parts.push(
-    planned > 0 ? (
-      <span key="plan">
-        сегодня запланировано{' '}
-        <b className="num text-[21px] font-medium">{fmtDuration(plannedMinutes)}</b>
-      </span>
-    ) : (
-      <span key="plan">на сегодня ничего не запланировано</span>
-    ),
+  const num = (v: string | number) => (
+    <span className="num font-medium" style={{ fontSize: '1.05em' }}>
+      {v}
+    </span>
   )
 
+  const first =
+    untouched > 0 && untouched === cold ? (
+      <>
+        <span style={{ color: 'var(--color-alarm)' }}>{num(untouched)}</span>{' '}
+        {plural(untouched, 'проект', 'проекта', 'проектов')} ещё ни разу не трогали
+      </>
+    ) : cold > 0 ? (
+      <>
+        <span style={{ color: 'var(--color-alarm)' }}>{num(cold)}</span>{' '}
+        {plural(cold, 'проект остыл', 'проекта остыли', 'проектов остыли')}
+      </>
+    ) : (
+      <>Все проекты в работе</>
+    )
+
   return (
-    <div className="py-[18px]">
-      <p className="text-[17px] leading-[1.35] sm:text-[19px]" style={{ fontWeight: 300 }}>
-        {parts.map((p, i) => (
-          <span key={i}>
-            {i > 0 && <span style={{ color: 'var(--color-ink4)' }}>, </span>}
-            {p}
-          </span>
-        ))}
-        <span style={{ color: 'var(--color-ink4)' }}>.</span>
-      </p>
+    <div className="py-6 sm:py-7">
+      <h1 className="text-[21px] leading-[1.3] sm:text-[24px]" style={{ fontWeight: 400 }}>
+        {first}
+        <span className="text-ink4">, </span>
+        {planned > 0 ? (
+          <>сегодня запланировано {num(fmtDuration(plannedMinutes))}</>
+        ) : (
+          <>на сегодня ничего не запланировано</>
+        )}
+        <span className="text-ink4">.</span>
+      </h1>
 
       {forgotten && (
-        <p className="pt-1 text-[13.5px] text-ink2">
+        <p className="pt-1.5 text-[14px] text-ink2">
           Дольше всех ждёт{' '}
           <button
             onClick={() => onReveal(forgotten.project.id)}
-            className="underline decoration-rule underline-offset-4 hover:decoration-ink"
-            style={{ color: 'var(--color-ink)' }}
+            className="font-medium text-ink underline decoration-line decoration-2 underline-offset-4 transition-colors hover:decoration-ink3"
           >
-            «{forgotten.project.name}»
-          </button>{' '}
+            {forgotten.project.name}
+          </button>
           {forgotten.daysSinceTouch === null ? (
-            <span>— к нему ещё не подходили</span>
+            <> — к нему ещё не подходили</>
           ) : (
-            <span>
+            <>
+              {' '}
               — <span className="num">{forgotten.daysSinceTouch}</span>{' '}
               {plural(forgotten.daysSinceTouch, 'день', 'дня', 'дней')}
-            </span>
+            </>
           )}
-          <span style={{ color: 'var(--color-ink4)' }}>.</span>
+          <span className="text-ink4">.</span>
         </p>
       )}
     </div>

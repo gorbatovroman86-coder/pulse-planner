@@ -19,7 +19,7 @@ export function Help({ onClose }: { onClose: () => void }) {
       <table className="w-full">
         <tbody>
           {rows.map(([k, v]) => (
-            <tr key={k} className="border-b" style={{ borderColor: 'var(--color-rule2)' }}>
+            <tr key={k} className="border-b" style={{ borderColor: 'var(--color-line2)' }}>
               <td className="num py-[7px] pr-4 text-[12.5px] w-[92px] align-top">{k}</td>
               <td className="py-[7px] text-[13px]">{v}</td>
             </tr>
@@ -71,7 +71,7 @@ export function Search({
           e.stopPropagation()
         }}
         placeholder="что ищем"
-        className="h-[38px] w-full border border-rule bg-paper px-3 text-[14px] outline-none placeholder:text-ink4"
+        className="h-[38px] w-full border border-line bg-paper px-3 text-[14px] outline-none placeholder:text-ink4"
       />
       <div className="max-h-[52vh] overflow-y-auto pt-3">
         {foundProjects.map((p) => (
@@ -82,18 +82,18 @@ export function Search({
               onClose()
             }}
             className="flex w-full items-center gap-2 border-b py-[7px] text-left"
-            style={{ borderColor: 'var(--color-rule2)' }}
+            style={{ borderColor: 'var(--color-line2)' }}
           >
             <span className="h-[13px] w-[3px]" style={{ backgroundColor: p.color }} />
             <span className="flex-1 truncate text-[13px]">{p.name}</span>
-            <span className="eyebrow">проект</span>
+            <span className="label">проект</span>
           </button>
         ))}
         {foundTasks.map((t) => (
           <div
             key={t.id}
             className="flex items-center gap-2 border-b py-[7px]"
-            style={{ borderColor: 'var(--color-rule2)' }}
+            style={{ borderColor: 'var(--color-line2)' }}
           >
             <span
               className="h-[7px] w-[7px] shrink-0"
@@ -140,13 +140,13 @@ function Sheet({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-[540px] border bg-card p-5 flip-in"
+        className="w-full max-w-[540px] border bg-surface p-5 flip-in"
         style={{ borderColor: 'var(--color-ink3)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between pb-2">
-          <span className="eyebrow">{title}</span>
-          <button onClick={onClose} className="eyebrow hover:text-warm">
+          <span className="label">{title}</span>
+          <button onClick={onClose} className="btn btn-ghost btn-sm">
             esc
           </button>
         </div>

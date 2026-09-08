@@ -1,27 +1,40 @@
 @import "tailwindcss";
 
-/* ── Направление: «Ведомость» ─────────────────────────────────────────────
-   Холодная каменная бумага, графитные чернила, пигментные метки проектов.
-   Цифры — только моноширинные. Единственная «картинка» — лента касаний.   */
+/* ── Направление: «спокойный прибор» ──────────────────────────────────────
+   Белые поверхности на холодной бумаге, иерархия весом и воздухом,
+   один акцент, моноширинный — только для чисел.
+   Единственная «картинка» интерфейса — лента касаний.                      */
 
 @theme {
-  --color-paper:  #E5E8E4;
-  --color-paper2: #DDE1DC;
-  --color-card:   #F2F4F1;
-  --color-ink:    #161C1A;
-  --color-ink2:   #4E5A55;
-  --color-ink3:   #8A938E;
-  --color-ink4:   #AEB6B1;
-  --color-rule:   #CCD2CC;
-  --color-rule2:  #DCE0DA;
-  --color-deep:   #14453C;
-  --color-warm:   #A8452F;
-  --color-hay:    #B57A1F;
+  /* поверхности */
+  --color-bg:      #EEF1F3;
+  --color-surface: #FFFFFF;
+  --color-sunken:  #F6F8F9;
+  --color-hover:   #F3F6F7;
+
+  /* чернила */
+  --color-ink:     #111820;
+  --color-ink2:    #57626E;
+  --color-ink3:    #8A95A1;
+  --color-ink4:    #AEB8C2;
+
+  /* линии */
+  --color-line:    #E2E7EB;
+  --color-line2:   #EDF0F3;
+
+  /* акцент и тревога */
+  --color-accent:      #0F5F4F;
+  --color-accent-soft: #E6F0ED;
+  --color-alarm:       #C2410C;
+  --color-alarm-soft:  #FBEDE6;
 
   --font-display: "Geologica Variable", ui-sans-serif, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-card: 0 1px 2px rgba(17, 24, 32, 0.04), 0 10px 28px -16px rgba(17, 24, 32, 0.16);
+  --shadow-pop: 0 2px 6px rgba(17, 24, 32, 0.06), 0 16px 40px -18px rgba(17, 24, 32, 0.24);
 }
 
 :root {
@@ -33,93 +46,155 @@ html, body, #root { height: 100%; }
 
 body {
   margin: 0;
-  background: var(--color-paper);
+  background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-display);
-  font-weight: 350;
-  font-size: 14px;
-  line-height: 1.45;
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Цифры, даты, длительности — всегда моноширинные и табличные */
-.num {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-  letter-spacing: -0.01em;
+@layer components {
+  /* Цифры, даты, длительности — моноширинные и табличные. Только они. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Служебная подпись: обычный регистр, приглушённая. Никакого капслока. */
+  .label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-ink3);
+    letter-spacing: 0;
+  }
+
+  /* Счётчик рядом с заголовком раздела */
+  .count {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-ink3);
+    background: var(--color-sunken);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button, input, textarea, select { font: inherit; color: inherit; }
+
+  /* ── Кнопки ───────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  }
+  .btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #0C4E41; }
+  .btn-primary:disabled { opacity: 0.45; }
+
+  .btn-quiet {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink2);
+  }
+  .btn-quiet:hover { background: var(--color-hover); color: var(--color-ink); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink3);
+  }
+  .btn-ghost:hover { background: var(--color-hover); color: var(--color-ink); }
+
+  .btn-sm { height: 28px; padding: 0 10px; font-size: 12.5px; border-radius: 7px; }
+
+  /* ── Поверхности ──────────────────────────────────────────────────────── */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .field {
+    height: 38px;
+    padding: 0 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 9px;
+    outline: none;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+  }
+  .field:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+  }
 }
 
-/* Служебные подписи ведомости */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-ink3);
-}
-
-button, input, textarea, select { font: inherit; color: inherit; }
-
-:where(button, [role="button"], input, textarea, a, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-deep);
+:where(button, [role="button"], input, textarea, a, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
-::selection { background: #14453C; color: #F2F4F1; }
+::selection { background: #0F5F4F; color: #fff; }
 
-/* Тонкие полосы прокрутки, чтобы не ломать плотность */
-* { scrollbar-width: thin; scrollbar-color: var(--color-rule) transparent; }
-*::-webkit-scrollbar { width: 8px; height: 8px; }
-*::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 0; }
+* { scrollbar-width: thin; scrollbar-color: var(--color-line) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
 *::-webkit-scrollbar-track { background: transparent; }
 
-/* ── Разворот строки: анимация высоты без замера ───────────────────────── */
+/* ── Разворот строки ──────────────────────────────────────────────────── */
 .expand { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 260ms var(--ease-out-soft); }
 .expand > * { overflow: hidden; min-height: 0; }
 .expand[data-open="true"] { grid-template-rows: 1fr; }
 
-/* ── Потепление: строка проекта после выполнения задачи ────────────────── */
+/* ── Потепление проекта после выполненной задачи ──────────────────────── */
 @keyframes warmwash {
-  0%   { background-color: color-mix(in oklab, var(--pigment) 22%, transparent); }
+  0%   { background-color: color-mix(in oklab, var(--pigment) 14%, transparent); }
   100% { background-color: transparent; }
 }
 .warming { animation: warmwash 1400ms var(--ease-out-soft); }
 
 @keyframes tickgrow {
   0%   { transform: scaleY(0.05); }
-  62%  { transform: scaleY(1.18); }
+  62%  { transform: scaleY(1.16); }
   100% { transform: scaleY(1); }
 }
 .tick-grow { animation: tickgrow 620ms cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom; }
 
 @keyframes flipin {
-  0%   { opacity: 0; transform: translateY(-6px); }
+  0%   { opacity: 0; transform: translateY(-6px) scale(0.99); }
   100% { opacity: 1; transform: none; }
 }
-.flip-in { animation: flipin 340ms var(--ease-out-soft); }
+.flip-in { animation: flipin 220ms var(--ease-out-soft); }
 
-/* ── Перенос задачи в «Сегодня» ────────────────────────────────────────── */
+/* ── Перенос задачи в «Сегодня» ───────────────────────────────────────── */
 @keyframes landing {
-  0%   { opacity: 0; transform: translateX(14px); background-color: color-mix(in oklab, var(--color-deep) 12%, transparent); }
+  0%   { opacity: 0; transform: translateX(12px); background-color: var(--color-accent-soft); }
   100% { opacity: 1; transform: none; background-color: transparent; }
 }
 .landing { animation: landing 420ms var(--ease-out-soft); }
 
-@keyframes strike {
-  0%   { opacity: 1; }
-  100% { opacity: 0.25; }
-}
-.striking { animation: strike 420ms ease-out forwards; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
-}
-
 @keyframes syncmove {
   from { background-position: 0 0; }
   to   { background-position: 16px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }

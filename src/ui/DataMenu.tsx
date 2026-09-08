@@ -52,7 +52,7 @@ export function DataMenu({ signedIn }: { signedIn: boolean }) {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="eyebrow border border-rule px-2 py-1 hover:bg-card"
+        className="btn btn-quiet btn-sm"
         aria-expanded={open}
       >
         данные
@@ -62,19 +62,19 @@ export function DataMenu({ signedIn }: { signedIn: boolean }) {
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
           <div
-            className="absolute right-0 top-[26px] z-40 w-[290px] border bg-card p-3 flip-in"
+            className="absolute right-0 top-[26px] z-40 w-[290px] border bg-surface p-3 flip-in"
             style={{ borderColor: 'var(--color-ink3)' }}
           >
             <p className="text-[12.5px] text-ink2 pb-2">
               Ручная копия на случай, если с облаком что-то случится. Формат тот же, что у ночного бэкапа.
             </p>
             <div className="flex flex-col gap-1.5">
-              <button onClick={doExport} className="eyebrow border border-rule px-2 py-1.5 text-left hover:bg-paper2">
+              <button onClick={doExport} className="label border border-line px-2 py-1.5 text-left hover:bg-sunken">
                 экспорт в JSON — скачать файл
               </button>
               <button
                 onClick={() => file.current?.click()}
-                className="eyebrow border border-rule px-2 py-1.5 text-left hover:bg-paper2"
+                className="label border border-line px-2 py-1.5 text-left hover:bg-sunken"
               >
                 импорт из JSON — заменить данные
               </button>
@@ -82,13 +82,13 @@ export function DataMenu({ signedIn }: { signedIn: boolean }) {
                 <>
                   <button
                     onClick={() => void refresh()}
-                    className="eyebrow border border-rule px-2 py-1.5 text-left hover:bg-paper2"
+                    className="label border border-line px-2 py-1.5 text-left hover:bg-sunken"
                   >
                     подтянуть из облака сейчас
                   </button>
                   <button
                     onClick={() => void signOut()}
-                    className="eyebrow px-2 py-1.5 text-left hover:text-warm"
+                    className="btn btn-ghost w-full justify-start"
                   >
                     выйти
                   </button>
@@ -106,7 +106,7 @@ export function DataMenu({ signedIn }: { signedIn: boolean }) {
                 e.target.value = ''
               }}
             />
-            {msg && <p className="pt-2 text-[12px]" style={{ color: 'var(--color-deep)' }}>{msg}</p>}
+            {msg && <p className="pt-2 text-[12px]" style={{ color: 'var(--color-accent)' }}>{msg}</p>}
           </div>
         </>
       )}
