@@ -139,3 +139,18 @@ export function parseInput(raw: string, projects: Project[]): ParsedInput {
     projectMatched: Boolean(project),
   }
 }
+
+/** Оценка одной строкой: «90» = минуты, «90м», «1,5ч». */
+export function parseDuration(raw: string): number | null {
+  const m = raw
+    .trim()
+    .toLowerCase()
+    .replace(',', '.')
+    .match(/^(\d+(?:\.\d+)?)\s*(мин|м|ч|час|часа|часов|h|m)?$/)
+  if (!m) return null
+  const n = Number(m[1])
+  if (!Number.isFinite(n) || n < 0) return null
+  const u = m[2] ?? 'м'
+  const isHours = u === 'ч' || u === 'час' || u === 'часа' || u === 'часов' || u === 'h'
+  return Math.round(isHours ? n * 60 : n)
+}

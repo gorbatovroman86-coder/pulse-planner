@@ -194,6 +194,7 @@ export default function App() {
           <PulseScreen
             projects={state.projects}
             tasks={state.tasks}
+            dayHours={state.settings.day_hours}
             warmedId={warmedProject?.id ?? null}
             landedId={landedId}
             selectedId={selected}
@@ -213,6 +214,7 @@ export default function App() {
             projects={state.projects}
             tasks={state.tasks}
             weekOffset={weekOffset}
+            dayHours={state.settings.day_hours}
             onShift={(n) => setWeekOffset((v) => (n === 0 ? 0 : v + n))}
           />
         )}

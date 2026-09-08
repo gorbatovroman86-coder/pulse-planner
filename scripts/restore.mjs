@@ -45,6 +45,15 @@ if (probe.status === 404 || probe.status === 400) {
 // 2. Проекты идут первыми: задачи на них ссылаются.
 const projects = await upsertAll(url, key, 'projects', snap.projects)
 const tasks = await upsertAll(url, key, 'tasks', snap.tasks)
+// Настройки появились во второй версии формата: старые копии их просто не содержат.
+if (snap.settings) {
+  const res = await fetch(`${url}/rest/v1/settings?on_conflict=user_id`, {
+    method: 'POST',
+    headers: { ...headers(key), Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify([snap.settings]),
+  })
+  if (!res.ok) console.error('настройки не восстановлены:', res.status, await res.text())
+}
 
 const at = snap.exported_at ? new Date(snap.exported_at) : null
 const when = at

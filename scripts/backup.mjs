@@ -12,12 +12,14 @@ const dir = process.argv[2] ?? 'backups'
 
 const projects = await readAll(url, key, 'projects')
 const tasks = await readAll(url, key, 'tasks')
+const settings = await readAll(url, key, 'settings')
 
 const snapshot = {
   exported_at: new Date().toISOString(),
   schema_version: SCHEMA_VERSION,
   projects,
   tasks,
+  settings: settings[0] ?? null,
 }
 
 fs.mkdirSync(dir, { recursive: true })

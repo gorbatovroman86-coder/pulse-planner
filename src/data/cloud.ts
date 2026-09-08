@@ -1,5 +1,5 @@
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js'
-import type { Project, Task } from '../types'
+import type { Project, Settings, Task } from '../types'
 
 const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -18,7 +18,7 @@ export const supabase: SupabaseClient | null = cloudEnabled
     })
   : null
 
-export type Row = { table: 'projects' | 'tasks'; row: Record<string, unknown> }
+export type Row = { table: 'projects' | 'tasks' | 'settings'; row: Record<string, unknown> }
 
 /** Наружу уходят только колонки схемы: user_id ставит база из auth.uid(). */
 export function projectRow(p: Project): Record<string, unknown> {
@@ -61,10 +61,19 @@ export async function getSession(): Promise<Session | null> {
   return data.session
 }
 
+export function settingsRow(s: Settings, userId: string): Record<string, unknown> {
+  return { user_id: userId, day_hours: s.day_hours, updated_at: s.updated_at }
+}
+
 export async function pushRows(rows: Row[]): Promise<void> {
   if (!supabase) return
   const projects = rows.filter((r) => r.table === 'projects').map((r) => r.row)
   const tasks = rows.filter((r) => r.table === 'tasks').map((r) => r.row)
+  const settings = rows.filter((r) => r.table === 'settings').map((r) => r.row)
+  if (settings.length) {
+    const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'user_id' })
+    if (error) throw new Error(error.message)
+  }
   if (projects.length) {
     const { error } = await supabase.from('projects').upsert(projects, { onConflict: 'id' })
     if (error) throw new Error(error.message)
@@ -75,11 +84,16 @@ export async function pushRows(rows: Row[]): Promise<void> {
   }
 }
 
-export async function pullAll(): Promise<{ projects: Project[]; tasks: Task[] }> {
-  if (!supabase) return { projects: [], tasks: [] }
-  const [p, t] = await Promise.all([
+export async function pullAll(): Promise<{
+  projects: Project[]
+  tasks: Task[]
+  settings: Settings | null
+}> {
+  if (!supabase) return { projects: [], tasks: [], settings: null }
+  const [p, t, s] = await Promise.all([
     supabase.from('projects').select('*'),
     supabase.from('tasks').select('*'),
+    supabase.from('settings').select('*').maybeSingle(),
   ])
   if (p.error) throw new Error(p.error.message)
   if (t.error) throw new Error(t.error.message)
@@ -89,5 +103,12 @@ export async function pullAll(): Promise<{ projects: Project[]; tasks: Task[] }>
       ...x,
       subtasks: Array.isArray(x.subtasks) ? x.subtasks : [],
     })),
+    settings: (s.data as unknown as Settings) ?? null,
   }
+}
+
+export async function currentUserId(): Promise<string | null> {
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser()
+  return data.user?.id ?? null
 }

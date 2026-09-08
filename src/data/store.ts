@@ -1,9 +1,19 @@
 import { useSyncExternalStore } from 'react'
-import type { Priority, Project, Snapshot, Subtask, Task, TaskStatus } from '../types'
-import { SCHEMA_VERSION } from '../types'
+import type { Priority, Project, Settings, Snapshot, Subtask, Task, TaskStatus } from '../types'
+import { DEFAULT_SETTINGS, SCHEMA_VERSION } from '../types'
 import { uid } from '../lib/id'
 import { buildSeed, PIGMENTS } from './seed'
-import { cloudEnabled, projectRow, pullAll, pushRows, supabase, taskRow, type Row } from './cloud'
+import {
+  cloudEnabled,
+  currentUserId,
+  projectRow,
+  pullAll,
+  pushRows,
+  settingsRow,
+  supabase,
+  taskRow,
+  type Row,
+} from './cloud'
 
 const KEY_STATE = 'puls.state.v1'
 const KEY_QUEUE = 'puls.queue.v1'
@@ -11,6 +21,7 @@ const KEY_QUEUE = 'puls.queue.v1'
 export interface State {
   projects: Project[]
   tasks: Task[]
+  settings: Settings
 }
 
 /** Что видит владелец в индикаторе. */
@@ -22,7 +33,7 @@ export type SyncState =
   | 'offline'
   | 'error'
 
-let state: State = { projects: [], tasks: [] }
+let state: State = { projects: [], tasks: [], settings: { ...DEFAULT_SETTINGS } }
 let queue = new Set<string>()
 let sync: SyncState = cloudEnabled ? 'signedout' : 'local'
 let syncError = ''
@@ -82,7 +93,11 @@ function loadLocal(): boolean {
     if (!raw) return false
     const parsed = JSON.parse(raw) as State
     if (!parsed || !Array.isArray(parsed.projects) || !Array.isArray(parsed.tasks)) return false
-    state = { projects: parsed.projects, tasks: parsed.tasks }
+    state = {
+      projects: parsed.projects,
+      tasks: parsed.tasks,
+      settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
+    }
     const q = localStorage.getItem(KEY_QUEUE)
     queue = new Set(q ? (JSON.parse(q) as string[]) : [])
     return true
@@ -95,7 +110,7 @@ export function initStore() {
   const had = loadLocal()
   if (!had && !cloudEnabled) {
     const seed = buildSeed()
-    state = seed
+    state = { ...seed, settings: { ...DEFAULT_SETTINGS } }
     markAll()
     persist()
   }
@@ -134,12 +149,13 @@ function setSync(s: SyncState, err = '') {
 
 // ── Очередь изменений ─────────────────────────────────────────────────────
 
-function mark(table: 'projects' | 'tasks', id: string) {
+function mark(table: 'projects' | 'tasks' | 'settings', id: string) {
   queue.add(`${table}:${id}`)
 }
 
 function markAll() {
-  state.projects.forEach((p) => mark('projects', p.id))
+  state.projects.forEach((p) => mark("projects", p.id))
+  mark("settings", "me")
   state.tasks.forEach((t) => mark('tasks', t.id))
 }
 
@@ -164,11 +180,14 @@ export async function flush(): Promise<void> {
   setSync('saving')
   const batch = [...queue]
   const rows: Row[] = []
+  const uid = await currentUserId()
   for (const key of batch) {
     const [table, id] = key.split(/:(.+)/)
     if (table === 'projects') {
       const p = state.projects.find((x) => x.id === id)
       if (p) rows.push({ table: 'projects', row: projectRow(p) })
+    } else if (table === 'settings') {
+      if (uid) rows.push({ table: 'settings', row: settingsRow(state.settings, uid) })
     } else {
       const t = state.tasks.find((x) => x.id === id)
       if (t) rows.push({ table: 'tasks', row: taskRow(t) })
@@ -205,14 +224,21 @@ export async function refresh(first = false): Promise<void> {
     setSync('saving')
     await flush()
     const remote = await pullAll()
+    const remoteSettings = remote.settings
     state = {
       projects: mergeById(state.projects, remote.projects),
       tasks: mergeById(state.tasks, remote.tasks),
+      settings:
+        remoteSettings &&
+        new Date(remoteSettings.updated_at).getTime() >
+          new Date(state.settings.updated_at).getTime()
+          ? { day_hours: Number(remoteSettings.day_hours), updated_at: remoteSettings.updated_at }
+          : state.settings,
     }
     // Первый вход на чистом облаке — раскладываем стартовые проекты.
     if (first && state.projects.length === 0) {
       const seed = buildSeed()
-      state = seed
+      state = { ...state, projects: seed.projects, tasks: seed.tasks }
       markAll()
     }
     persist()
@@ -274,6 +300,7 @@ export function touchProject(id: string) {
 export function deleteProject(id: string) {
   const ts = now()
   state = {
+    ...state,
     projects: state.projects.map((p) => (p.id === id ? { ...p, deleted_at: ts, updated_at: ts } : p)),
     tasks: state.tasks.map((t) =>
       t.project_id === id ? { ...t, deleted_at: ts, updated_at: ts } : t,
@@ -387,6 +414,14 @@ export function removeSubtask(taskId: string, subId: string) {
   updateTask(taskId, { subtasks: t.subtasks.filter((s) => s.id !== subId) })
 }
 
+/** Длина рабочего дня — сколько часов реально помещается. */
+export function setDayHours(hours: number) {
+  const v = Math.max(1, Math.min(24, hours))
+  state = { ...state, settings: { day_hours: v, updated_at: now() } }
+  mark('settings', 'me')
+  commit()
+}
+
 export function clearWarm() {
   warmedProject = null
   emit()
@@ -400,6 +435,7 @@ export function exportSnapshot(): Snapshot {
     schema_version: SCHEMA_VERSION,
     projects: state.projects,
     tasks: state.tasks,
+    settings: state.settings,
   }
 }
 
@@ -409,10 +445,17 @@ export function importSnapshot(snap: Snapshot, mode: 'merge' | 'replace' = 'repl
     ...t,
     subtasks: Array.isArray(t.subtasks) ? t.subtasks : [],
   }))
+  const settings = snap.settings
+    ? { day_hours: Number(snap.settings.day_hours) || 8, updated_at: snap.settings.updated_at }
+    : state.settings
   state =
     mode === 'replace'
-      ? { projects, tasks }
-      : { projects: mergeById(state.projects, projects), tasks: mergeById(state.tasks, tasks) }
+      ? { projects, tasks, settings }
+      : {
+          projects: mergeById(state.projects, projects),
+          tasks: mergeById(state.tasks, tasks),
+          settings,
+        }
   markAll()
   commit()
 }

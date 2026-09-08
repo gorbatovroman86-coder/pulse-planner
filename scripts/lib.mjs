@@ -1,8 +1,8 @@
 // Общая часть для снятия копии и восстановления.
 // Ни одной внешней зависимости: только fetch из Node.
 
-export const SCHEMA_VERSION = 1
-export const TABLES = ['projects', 'tasks']
+export const SCHEMA_VERSION = 2
+export const TABLES = ['projects', 'tasks', 'settings']
 
 export function env(name) {
   const v = process.env[name]

@@ -9,6 +9,7 @@ import { Inbox } from './Inbox'
 export function PulseScreen({
   projects,
   tasks,
+  dayHours,
   warmedId,
   landedId,
   selectedId,
@@ -16,6 +17,7 @@ export function PulseScreen({
 }: {
   projects: Project[]
   tasks: Task[]
+  dayHours: number
   warmedId: string | null
   landedId: string | null
   selectedId: string | null
@@ -58,7 +60,13 @@ export function PulseScreen({
         </div>
 
         <div className="order-1 min-w-0 xl:order-2 xl:sticky xl:top-[74px]">
-          <Today tasks={today} projects={projects} landedId={landedId} selectedId={selectedId} />
+          <Today
+            tasks={today}
+            projects={projects}
+            landedId={landedId}
+            selectedId={selectedId}
+            dayHours={dayHours}
+          />
         </div>
       </div>
     </div>

@@ -7,13 +7,16 @@ export function WeekScreen({
   projects,
   tasks,
   weekOffset,
+  dayHours,
   onShift,
 }: {
   projects: Project[]
   tasks: Task[]
   weekOffset: number
+  dayHours: number
   onShift: (n: number) => void
 }) {
+  const capacity = Math.round(dayHours * 60)
   const base = startOfWeek(new Date())
   const weekStart = addDays(base, weekOffset * 7)
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
@@ -119,7 +122,17 @@ export function WeekScreen({
                 ))}
               </div>
               {minutes > 0 && (
-                <div className="num pt-1 text-right text-[11.5px] text-ink3">{fmtHours(minutes)} ч</div>
+                <div
+                  className="num pt-1 text-right text-[11.5px]"
+                  style={{ color: minutes > capacity ? 'var(--color-alarm)' : 'var(--color-ink3)' }}
+                  title={
+                    minutes > capacity
+                      ? `Больше, чем помещается в день (${fmtHours(capacity)} ч)`
+                      : `Из ${fmtHours(capacity)} ч`
+                  }
+                >
+                  {fmtHours(minutes)} ч
+                </div>
               )}
               {list.length === 0 && <div className="pt-1 text-[13px] text-ink4">—</div>}
             </div>
