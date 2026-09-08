@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* ── Направление: «Ведомость» ─────────────────────────────────────────────
+   Холодная каменная бумага, графитные чернила, пигментные метки проектов.
+   Цифры — только моноширинные. Единственная «картинка» — лента касаний.   */
+
+@theme {
+  --color-paper:  #E5E8E4;
+  --color-paper2: #DDE1DC;
+  --color-card:   #F2F4F1;
+  --color-ink:    #161C1A;
+  --color-ink2:   #4E5A55;
+  --color-ink3:   #8A938E;
+  --color-ink4:   #AEB6B1;
+  --color-rule:   #CCD2CC;
+  --color-rule2:  #DCE0DA;
+  --color-deep:   #14453C;
+  --color-warm:   #A8452F;
+  --color-hay:    #B57A1F;
+
+  --font-display: "Geologica Variable", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: light;
+  --pigment: var(--color-ink3);
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Цифры, даты, длительности — всегда моноширинные и табличные */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+
+/* Служебные подписи ведомости */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink3);
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+
+:where(button, [role="button"], input, textarea, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-deep);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection { background: #14453C; color: #F2F4F1; }
+
+/* Тонкие полосы прокрутки, чтобы не ломать плотность */
+* { scrollbar-width: thin; scrollbar-color: var(--color-rule) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--color-rule); border-radius: 0; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Разворот строки: анимация высоты без замера ───────────────────────── */
+.expand { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 260ms var(--ease-out-soft); }
+.expand > * { overflow: hidden; min-height: 0; }
+.expand[data-open="true"] { grid-template-rows: 1fr; }
+
+/* ── Потепление: строка проекта после выполнения задачи ────────────────── */
+@keyframes warmwash {
+  0%   { background-color: color-mix(in oklab, var(--pigment) 22%, transparent); }
+  100% { background-color: transparent; }
+}
+.warming { animation: warmwash 1400ms var(--ease-out-soft); }
+
+@keyframes tickgrow {
+  0%   { transform: scaleY(0.05); }
+  62%  { transform: scaleY(1.18); }
+  100% { transform: scaleY(1); }
+}
+.tick-grow { animation: tickgrow 620ms cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom; }
+
+@keyframes flipin {
+  0%   { opacity: 0; transform: translateY(-6px); }
+  100% { opacity: 1; transform: none; }
+}
+.flip-in { animation: flipin 340ms var(--ease-out-soft); }
+
+/* ── Перенос задачи в «Сегодня» ────────────────────────────────────────── */
+@keyframes landing {
+  0%   { opacity: 0; transform: translateX(14px); background-color: color-mix(in oklab, var(--color-deep) 12%, transparent); }
+  100% { opacity: 1; transform: none; background-color: transparent; }
+}
+.landing { animation: landing 420ms var(--ease-out-soft); }
+
+@keyframes strike {
+  0%   { opacity: 1; }
+  100% { opacity: 0.25; }
+}
+.striking { animation: strike 420ms ease-out forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+@keyframes syncmove {
+  from { background-position: 0 0; }
+  to   { background-position: 16px 0; }
+}
