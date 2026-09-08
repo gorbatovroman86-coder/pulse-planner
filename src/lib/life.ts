@@ -1,7 +1,7 @@
 import type { Pulse } from './derive'
 
 /**
- * Степень жизни проекта. Порог задаётся у проекта (по умолчанию два дня):
+ * Степень жизни проекта. Порог задаётся у проекта (по умолчанию два рабочих дня):
  * если за это время ни одна задача не закрыта и касаний не было — проект умер.
  */
 export type Life = 'new' | 'fire' | 'cooling' | 'dead'
@@ -24,7 +24,7 @@ export const LIFE: Record<Life, LifeLook> = {
     id: 'fire',
     title: 'Горит',
     emoji: '🔥',
-    hint: 'сегодня к ним прикасались',
+    hint: 'работа не прерывалась',
     ink: '#B45309',
     soft: '#FEF3E2',
     anim: 'sticker-fire',
@@ -33,7 +33,7 @@ export const LIFE: Record<Life, LifeLook> = {
     id: 'cooling',
     title: 'Стынет',
     emoji: '🌡️',
-    hint: 'день без закрытых задач — ещё можно спасти',
+    hint: 'рабочий день без закрытых задач — ещё можно спасти',
     ink: '#0F5F4F',
     soft: '#EAF2EF',
     anim: 'sticker-cool',
@@ -59,7 +59,7 @@ export const LIFE: Record<Life, LifeLook> = {
 }
 
 export function lifeOf(pulse: Pulse): Life {
-  const d = pulse.daysSinceTouch
+  const d = pulse.idleWorkdays
   if (d === null) return 'new'
   if (d === 0) return 'fire'
   if (d < pulse.project.cooldown_days) return 'cooling'
@@ -68,7 +68,7 @@ export function lifeOf(pulse: Pulse): Life {
 
 /** Насколько проект «жив» от 0 до 1 — для полосы и насыщенности стикера. */
 export function vitality(pulse: Pulse): number {
-  const d = pulse.daysSinceTouch
+  const d = pulse.idleWorkdays
   if (d === null) return 0
   const cd = Math.max(1, pulse.project.cooldown_days)
   return Math.max(0, Math.min(1, 1 - d / (cd + 1)))

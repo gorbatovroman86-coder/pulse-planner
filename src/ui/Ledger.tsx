@@ -1,25 +1,26 @@
 import { useEffect, useState } from 'react'
 import type { Task } from '../types'
 import type { Pulse } from '../lib/derive'
-import { fmtDate, plural } from '../lib/dates'
+import { WEEKDAYS_SHORT, afterWorkdays, daysBetween, fmtDate, plural } from '../lib/dates'
 import { adviseProject } from '../lib/advisor'
 import { BudgetFraction } from './atoms'
 import { DeathCount, Lifeline } from './Lifeline'
 import { TaskLine } from './TaskLine'
-import { addTask, touchProject } from '../data/store'
+import { addTask, deleteProject, touchProject } from '../data/store'
 import { useFlip } from './useFlip'
 
 type Zone = 'alive' | 'edge' | 'grave' | 'new'
 
 const ZONES: { id: Zone; emoji: string; title: string; hint: string; ink: string }[] = [
-  { id: 'alive', emoji: '🟢', title: 'В работе', hint: 'сегодня закрывал задачи', ink: 'var(--color-accent)' },
-  { id: 'edge', emoji: '⚠️', title: 'На грани', hint: 'ещё день — и умрёт', ink: '#B45309' },
+  { id: 'alive', emoji: '🟢', title: 'В работе', hint: 'простоя нет', ink: 'var(--color-accent)' },
+  { id: 'edge', emoji: '⚠️', title: 'На грани', hint: 'ещё рабочий день — и умрёт', ink: '#B45309' },
   { id: 'grave', emoji: '💀', title: 'Кладбище', hint: 'работа встала', ink: 'var(--color-alarm)' },
   { id: 'new', emoji: '🌱', title: 'Ещё не начаты', hint: 'ни одного касания — умирать пока нечему', ink: 'var(--color-ink2)' },
 ]
 
 function zoneOf(p: Pulse): Zone {
-  const d = p.daysSinceTouch
+  // Простой считается в рабочих днях: выходные проект не хоронят.
+  const d = p.idleWorkdays
   // Непочатый проект не «умер» — он ещё не жил.
   if (d === null) return 'new'
   if (d === 0) return 'alive'
@@ -29,12 +30,14 @@ function zoneOf(p: Pulse): Zone {
 export function Ledger({
   pulses,
   tasks,
+  dayHours,
   warmedId,
   revealId,
   onOpenProject,
 }: {
   pulses: Pulse[]
   tasks: Task[]
+  dayHours: number
   warmedId: string | null
   revealId: string | null
   onOpenProject: (id: string) => void
@@ -103,6 +106,7 @@ export function Ledger({
               pulse={p}
               zone={zone}
               tasks={tasks}
+              dayHours={dayHours}
               expanded={open.has(p.project.id)}
               onToggle={() => toggle(p.project.id)}
               warmed={warmedId === p.project.id}
@@ -126,9 +130,19 @@ function statusText(p: Pulse): { text: string; ink: string } {
   const d = p.daysSinceTouch
   if (d === null) return { text: 'не начат', ink: 'var(--color-ink3)' }
   if (d === 0) return { text: 'сегодня', ink: 'var(--color-accent)' }
-  if (p.daysToDeath !== null) {
+  // Выходные простой не копят: проект жив, хотя работал не сегодня.
+  if (p.idleWorkdays === 0) {
     return {
-      text: p.daysToDeath === 1 ? 'умрёт завтра' : `умрёт через ${p.daysToDeath} дн.`,
+      text: d === 1 ? 'вчера' : `${d} ${plural(d, 'день', 'дня', 'дней')} назад`,
+      ink: 'var(--color-accent)',
+    }
+  }
+  if (p.daysToDeath !== null) {
+    // Порог в рабочих днях: в пятницу «ещё один» — это понедельник, а не суббота.
+    const day = afterWorkdays(p.daysToDeath)
+    const left = daysBetween(new Date(), day)
+    return {
+      text: left === 1 ? 'умрёт завтра' : `умрёт в ${WEEKDAYS_SHORT[(day.getDay() + 6) % 7]}`,
       ink: '#B45309',
     }
   }
@@ -139,6 +153,7 @@ function Row({
   pulse,
   zone,
   tasks,
+  dayHours,
   expanded,
   onToggle,
   warmed,
@@ -148,6 +163,7 @@ function Row({
   pulse: Pulse
   zone: Zone
   tasks: Task[]
+  dayHours: number
   expanded: boolean
   onToggle: () => void
   warmed: boolean
@@ -215,6 +231,7 @@ function Row({
             strip={pulse.strip}
             deadDays={pulse.deadDays}
             color={p.color}
+            dayMinutes={Math.round(dayHours * 60)}
             animateLast={warmed}
           />
         </div>
@@ -365,6 +382,16 @@ function Expanded({
         </button>
         <button onClick={() => onOpenProject(p.id)} className="btn btn-ghost">
           Весь проект
+        </button>
+        <button
+          onClick={() => {
+            if (confirm(`Удалить проект «${p.name}» вместе с задачами?`)) deleteProject(p.id)
+          }}
+          className="btn btn-ghost"
+          style={{ color: 'var(--color-alarm)' }}
+          title="Проект и его задачи скроются; вернуть можно из ночной копии"
+        >
+          Удалить
         </button>
       </div>
     </div>

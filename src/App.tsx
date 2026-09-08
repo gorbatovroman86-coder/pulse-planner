@@ -205,6 +205,7 @@ export default function App() {
           <ProjectScreen
             projects={state.projects}
             tasks={state.tasks}
+            dayHours={state.settings.day_hours}
             currentId={projectId}
             onSelect={setProjectId}
           />

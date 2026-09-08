@@ -9,11 +9,13 @@ import { addProject, addTask, deleteProject, touchProject, updateProject } from 
 export function ProjectScreen({
   projects,
   tasks,
+  dayHours,
   currentId,
   onSelect,
 }: {
   projects: Project[]
   tasks: Task[]
+  dayHours: number
   currentId: string | null
   onSelect: (id: string) => void
 }) {
@@ -62,7 +64,7 @@ export function ProjectScreen({
 
       <div className="w-full min-w-0 flex-1">
         {current ? (
-          <Detail key={current.id} project={current} tasks={tasks} />
+          <Detail key={current.id} project={current} tasks={tasks} dayHours={dayHours} />
         ) : (
           <p className="text-ink3">Проектов нет.</p>
         )}
@@ -71,7 +73,15 @@ export function ProjectScreen({
   )
 }
 
-function Detail({ project, tasks }: { project: Project; tasks: Task[] }) {
+function Detail({
+  project,
+  tasks,
+  dayHours,
+}: {
+  project: Project
+  tasks: Task[]
+  dayHours: number
+}) {
   const pulse = computePulse(project, tasks)
   const mine = tasks.filter((t) => !t.deleted_at && t.project_id === project.id)
   const done = mine.filter((t) => t.status === 'done').sort((a, b) => (a.done_at! < b.done_at! ? 1 : -1))
@@ -141,7 +151,7 @@ function Detail({ project, tasks }: { project: Project; tasks: Task[] }) {
             <span className="num text-[16px] font-medium">{pulse.openTasks.length}</span>
           </Stat>
           <Stat label="Три недели">
-            <Strip data={pulse.strip} color={project.color} />
+            <Strip data={pulse.strip} color={project.color} dayMinutes={Math.round(dayHours * 60)} />
           </Stat>
         </div>
 
@@ -157,7 +167,7 @@ function Detail({ project, tasks }: { project: Project; tasks: Task[] }) {
                 onChange={(v) => updateProject(project.id, { weekly_budget_hours: v })}
               />
               <NumberField
-                label="Порог остывания, дней"
+                label="Порог остывания, рабочих дней"
                 value={project.cooldown_days}
                 onChange={(v) => updateProject(project.id, { cooldown_days: Math.max(1, Math.round(v)) })}
               />

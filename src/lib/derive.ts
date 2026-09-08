@@ -1,5 +1,15 @@
 import type { Project, Task } from '../types'
-import { DAY, daysBetween, isoDate, parseIsoDate, startOfDay, startOfWeek } from './dates'
+import {
+  DAY,
+  addDays,
+  daysBetween,
+  isWorkday,
+  isoDate,
+  parseIsoDate,
+  startOfDay,
+  startOfWeek,
+  workdaysBetween,
+} from './dates'
 
 export interface Pulse {
   project: Project
@@ -14,6 +24,8 @@ export interface Pulse {
   /** Последнее касание: максимум из ручной отметки и выполнений задач. */
   lastTouch: string | null
   daysSinceTouch: number | null
+  /** Простой в рабочих днях: выходные его не копят. По нему считается смерть. */
+  idleWorkdays: number | null
   cold: boolean
   noTasks: boolean
   /** Лента: минуты, закрытые в каждый из последних STRIP_DAYS дней. */
@@ -22,7 +34,7 @@ export interface Pulse {
   deadDays: boolean[]
   /** Сколько раз проект умирал за окно ленты. */
   deaths: number
-  /** Сколько дней осталось до смерти; null — уже мёртв или ещё не начат. */
+  /** Сколько рабочих дней осталось до смерти; null — уже мёртв или ещё не начат. */
   daysToDeath: number | null
 }
 
@@ -77,16 +89,21 @@ export function computePulse(project: Project, tasks: Task[], now = new Date()):
   const touchMs = Math.max(manual ?? 0, lastDone ?? 0) || null
   const lastTouch = touchMs ? new Date(touchMs).toISOString() : null
   const daysSinceTouch = touchMs === null ? null : daysBetween(new Date(touchMs), now)
+  const idleWorkdays = touchMs === null ? null : workdaysBetween(new Date(touchMs), now)
 
-  // Смерть по правилу владельца: подряд cooldown дней без единой закрытой задачи.
+  // Смерть по правилу владельца: подряд cooldown РАБОЧИХ дней без единой закрытой
+  // задачи. Выходные простой не копят — суббота и воскресенье наследуют пятницу.
   const cd = Math.max(1, project.cooldown_days)
+  const workday = strip.map((_, i) => isWorkday(addDays(today, i - (STRIP_DAYS - 1))))
   const deadDays = strip.map((_, i) => {
-    for (let k = 0; k < cd; k++) {
-      const idx = i - k
-      if (idx < 0) return false
-      if (strip[idx] > 0) return false
+    let counted = 0
+    for (let j = i; j >= 0; j--) {
+      if (strip[j] > 0) return false
+      if (workday[j]) counted += 1
+      if (counted >= cd) return true
     }
-    return true
+    // Истории в окне не хватает, чтобы объявить смерть.
+    return false
   })
   // Смертью считается только обрыв работы: проект, который в окне
   // ни разу не работал, не «умер один раз», а просто не начинался.
@@ -110,11 +127,11 @@ export function computePulse(project: Project, tasks: Task[], now = new Date()):
     overdue,
     lastTouch,
     daysSinceTouch,
-    cold: daysSinceTouch === null || daysSinceTouch >= project.cooldown_days,
+    idleWorkdays,
+    cold: idleWorkdays === null || idleWorkdays >= cd,
     noTasks: openTasks.length === 0,
     strip,
-    daysToDeath:
-      daysSinceTouch === null || daysSinceTouch >= cd ? null : cd - daysSinceTouch,
+    daysToDeath: idleWorkdays === null || idleWorkdays >= cd ? null : cd - idleWorkdays,
   }
 }
 

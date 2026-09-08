@@ -45,6 +45,35 @@ export function daysBetween(from: Date | string, to: Date | string = new Date())
   return Math.round((b - a) / DAY)
 }
 
+/** Рабочий день — понедельник–пятница. Выходные простой не копят. */
+export function isWorkday(d: Date): boolean {
+  const w = d.getDay()
+  return w !== 0 && w !== 6
+}
+
+/** Сколько рабочих дней прошло после дня `from` по день `to` включительно. */
+export function workdaysBetween(from: Date | string, to: Date | string = new Date()): number {
+  const days = daysBetween(from, to)
+  if (days <= 0) return 0
+  let n = Math.floor(days / 7) * 5
+  let w = startOfDay(from).getDay()
+  for (let i = 0; i < days % 7; i++) {
+    w = (w + 1) % 7
+    if (w !== 0 && w !== 6) n += 1
+  }
+  return n
+}
+
+/** День, до которого осталось `left` рабочих дней. */
+export function afterWorkdays(left: number, from: Date = new Date()): Date {
+  const d = startOfDay(from)
+  for (let n = left; n > 0; ) {
+    d.setDate(d.getDate() + 1)
+    if (isWorkday(d)) n -= 1
+  }
+  return d
+}
+
 /** «14.09» — основной формат дат в интерфейсе. */
 export function fmtDate(d: Date | string | null): string {
   if (!d) return '—'

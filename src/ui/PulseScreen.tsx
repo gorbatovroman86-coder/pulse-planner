@@ -52,6 +52,7 @@ export function PulseScreen({
           <Ledger
             pulses={pulses}
             tasks={tasks}
+            dayHours={dayHours}
             warmedId={warmedId}
             revealId={reveal ? reveal.id : null}
             onOpenProject={onOpenProject}

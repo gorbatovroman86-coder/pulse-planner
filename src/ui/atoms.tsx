@@ -1,5 +1,5 @@
 import { STRIP_DAYS } from '../lib/derive'
-import { DAY, fmtHours, startOfDay } from '../lib/dates'
+import { DAY, fmtDate, fmtHours, startOfDay } from '../lib/dates'
 
 /**
  * Пульс недели: сколько внимания вложено против бюджета.
@@ -70,6 +70,7 @@ export function PriorityMark({ p }: { p: 1 | 2 | 3 }) {
 export function Strip({
   data,
   color,
+  dayMinutes,
   height = 28,
   cell = 5,
   gap = 3,
@@ -77,12 +78,14 @@ export function Strip({
 }: {
   data: number[]
   color: string
+  /** Дневная норма в минутах: полный столбик — весь день. */
+  dayMinutes: number
   height?: number
   cell?: number
   gap?: number
   animateLast?: boolean
 }) {
-  const max = Math.max(60, ...data)
+  const max = Math.max(60, dayMinutes)
   const today = startOfDay(new Date())
   return (
     <div className="flex items-end" style={{ height, gap }} title={`Закрытые часы за ${STRIP_DAYS} дней`}>
@@ -90,7 +93,15 @@ export function Strip({
         const day = new Date(today.getTime() - (data.length - 1 - i) * DAY)
         const monday = day.getDay() === 1
         const isToday = i === data.length - 1
-        const h = minutes > 0 ? Math.max(4, Math.round((minutes / max) * height)) : 2
+        const over = minutes > max
+        const h =
+          minutes > 0 ? Math.min(height, Math.max(4, Math.round((minutes / max) * height))) : 2
+        const fill =
+          minutes > 0
+            ? isToday
+              ? color
+              : `color-mix(in oklab, ${color} 55%, #fff)`
+            : 'var(--color-line)'
         return (
           <div key={i} className="relative flex items-end" style={{ width: cell, height }}>
             {monday && (
@@ -101,16 +112,21 @@ export function Strip({
               />
             )}
             <span
-              className={`relative rounded-full ${isToday && animateLast && minutes > 0 ? 'tick-grow' : ''}`}
+              className={`relative rounded-t-[2px] ${isToday && animateLast && minutes > 0 ? 'tick-grow' : ''}`}
+              title={
+                minutes === 0
+                  ? `${fmtDate(day)} — пусто`
+                  : `${fmtDate(day)} — ${fmtHours(minutes)} ч${over ? ' (сверх дневной нормы)' : ''}`
+              }
               style={{
                 width: cell,
                 height: h,
-                backgroundColor:
-                  minutes > 0
-                    ? isToday
-                      ? color
-                      : `color-mix(in oklab, ${color} 55%, #fff)`
-                    : 'var(--color-line)',
+                // Зарубка-обрыв у столбика, переросшего шкалу.
+                ...(over
+                  ? {
+                      backgroundImage: `linear-gradient(to top, ${fill} calc(100% - 7px), transparent calc(100% - 7px), transparent calc(100% - 5px), ${fill} calc(100% - 5px))`,
+                    }
+                  : { backgroundColor: fill }),
               }}
             />
           </div>
